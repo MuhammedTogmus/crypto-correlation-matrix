@@ -3,171 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kripto para korelasyon ısı haritası - Pearson korelasyon analizi ile top coinlerin ilişki matrisi">
-    <title>Kripto Korelasyon Isı Haritası | Finansal Analiz Terminali</title>
-
-    <!-- Google Fonts -->
+    <meta name="description" content="Kripto para korelasyon ısı haritası - Top 200 coin, 10x10 matris, 5 renk teması">
+    <title>CryptoCorr | Korelasyon Analizi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Plotly.js CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-
-    <!-- Stil dosyası -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ═══════════════════════════════════════════════ -->
-    <!--  ÜST BAR - Terminal başlık çubuğu              -->
-    <!-- ═══════════════════════════════════════════════ -->
-    <header id="terminal-header">
-        <div class="header-left">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
-            <span class="terminal-title">CRYPTO CORRELATION TERMINAL</span>
+    <!-- NAV -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#FCD535"/><path d="M14 6L18.5 10.5L16.4 12.6L14 10.2L11.6 12.6L9.5 10.5L14 6Z" fill="#181A20"/><path d="M14 22L9.5 17.5L11.6 15.4L14 17.8L16.4 15.4L18.5 17.5L14 22Z" fill="#181A20"/></svg>
+                <span class="brand-name">CryptoCorr</span>
+                <span class="brand-badge">HEATMAP</span>
+            </div>
+            <div class="nav-center">
+                <span class="nav-status" id="nav-status"><span class="status-dot"></span>Bağlantı Bekleniyor</span>
+            </div>
+            <div class="nav-right">
+                <span id="nav-time">--:--</span>
+            </div>
         </div>
-        <div class="header-center">
-            <span class="header-badge" id="status-badge">
-                <span class="pulse-dot"></span>
-                BAĞLANTI BEKLENİYOR
-            </span>
+    </nav>
+
+    <main id="app">
+
+        <!-- Metrikler -->
+        <section id="metrics-bar">
+            <div class="metric-card"><span class="metric-label">Kaynak</span><span class="metric-value"><span class="metric-icon">◆</span> Binance</span></div>
+            <div class="metric-card interactive" id="card-matrix" title="Matrisi Değiştir"><span class="metric-label">Matris <span class="metric-icon" style="opacity:0.7">✎</span></span><span class="metric-value" id="display-matrix">—</span></div>
+            <div class="metric-card interactive" id="card-period" title="Periyodu Değiştir"><span class="metric-label">Periyot <span class="metric-icon" style="opacity:0.7">✎</span></span><span class="metric-value" id="display-period">30 Gün</span></div>
+            <div class="metric-card"><span class="metric-label">Metod</span><span class="metric-value">Pearson</span></div>
+        </section>
+
+        <!-- İLK YÜKLEME -->
+        <section id="initial-loader">
+            <div class="loader-box">
+                <div class="spinner"></div>
+                <p class="loader-title" id="initial-loader-text">Piyasa Verileri Yükleniyor</p>
+                <div class="progress-track"><div class="progress-bar" id="initial-loader-progress"></div></div>
+                <p class="loader-desc" id="initial-loader-subtext">Binance'den en hacimli 200 coin çekiliyor...</p>
+            </div>
+        </section>
+
+        <!-- COİN SEÇİM -->
+        <section id="coin-selector" class="hidden">
+            <div class="selector-top">
+                <div><h1 class="selector-title">Coin Seçimi</h1><p class="selector-desc">Korelasyon analizi için coinlerinizi seçin</p></div>
+                <div class="toggle-group">
+                    <div class="toggle-section">
+                        <span class="toggle-label">Matris:</span>
+                        <div class="toggle-row" id="matrix-toggles">
+                            <button class="toggle-btn" data-size="4">4</button>
+                            <button class="toggle-btn active" data-size="5">5</button>
+                            <button class="toggle-btn" data-size="6">6</button>
+                            <button class="toggle-btn" data-size="7">7</button>
+                            <button class="toggle-btn" data-size="8">8</button>
+                            <button class="toggle-btn" data-size="9">9</button>
+                            <button class="toggle-btn" data-size="10">10</button>
+                        </div>
+                    </div>
+                    <div class="toggle-section">
+                        <span class="toggle-label">Periyot:</span>
+                        <div class="toggle-row">
+                            <button class="toggle-btn period-btn" data-period="6h">6s</button>
+                            <button class="toggle-btn period-btn" data-period="1d">1g</button>
+                            <button class="toggle-btn period-btn" data-period="7d">7g</button>
+                            <button class="toggle-btn period-btn active" data-period="30d">30g</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="search-row">
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="coin-search-input" placeholder="Coin ara..." autocomplete="off">
+                    <button id="btn-clear-search" class="search-clear hidden">✕</button>
+                </div>
+                <span class="counter" id="selection-counter">0 / 5 seçildi</span>
+            </div>
+            <div class="chips-row" id="selected-chips"><span class="chips-empty">Henüz coin seçilmedi</span></div>
+            <div class="coin-grid" id="coin-list-container"></div>
+            <div class="action-row">
+                <button id="btn-analyze" class="btn-primary" disabled>Analiz Başlat</button>
+                <button id="btn-clear-selection" class="btn-ghost">Temizle</button>
+            </div>
+        </section>
+
+        <!-- ANALİZ YÜKLEME -->
+        <section id="analysis-loader" class="hidden">
+            <div class="loader-box">
+                <div class="spinner"></div>
+                <p class="loader-title" id="loader-text">Veriler Analiz Ediliyor</p>
+                <div class="progress-track"><div class="progress-bar" id="loader-progress"></div></div>
+                <p class="loader-desc" id="loader-subtext">Fiyat verileri çekiliyor...</p>
+            </div>
+        </section>
+
+        <!-- SONUÇLAR -->
+        <section id="results-section" class="hidden">
+            <!-- Üst bar: başlık + aksiyonlar -->
+            <div class="result-header">
+                <div>
+                    <h1 class="result-title">Korelasyon Matrisi</h1>
+                    <p class="result-desc" id="result-coins-label">—</p>
+                </div>
+                <div class="result-actions">
+                    <!-- Renk tema seçici -->
+                    <div class="theme-selector">
+                        <button class="theme-dot active" data-theme="ocean" title="Okyanus" style="background:linear-gradient(135deg,#FF1744,#2196F3,#00E676)"></button>
+                        <button class="theme-dot" data-theme="fire" title="Ateş" style="background:linear-gradient(135deg,#1565C0,#FF6D00,#FFD600)"></button>
+                        <button class="theme-dot" data-theme="neon" title="Neon" style="background:linear-gradient(135deg,#E040FB,#1E2329,#00FFFF)"></button>
+                        <button class="theme-dot" data-theme="classic" title="Klasik" style="background:linear-gradient(135deg,#D32F2F,#FAFAFA,#1976D2)"></button>
+                        <button class="theme-dot" data-theme="sunset" title="Gün Batımı" style="background:linear-gradient(135deg,#4A148C,#FF5722,#FFC107)"></button>
+                    </div>
+                    <button id="btn-back" class="btn-outline">◀ Geri</button>
+                    <button id="btn-refresh" class="btn-outline">↻ Yenile</button>
+                </div>
+            </div>
+
+            <!-- Heatmap + İstatistikler yan yana -->
+            <div class="result-body">
+                <div class="result-left">
+                    <div class="chart-wrapper"><div id="heatmap-chart"></div></div>
+                    <div class="scale-bar">
+                        <span class="scale-label">−1.0 Negatif</span>
+                        <div class="scale-gradient" id="scale-gradient"></div>
+                        <span class="scale-label">+1.0 Pozitif</span>
+                    </div>
+                </div>
+                <div class="result-right">
+                    <h3 class="side-title">Korelasyon Değerleri</h3>
+                    <div class="side-stats" id="stats-grid"></div>
+                </div>
+            </div>
+
+            <!-- Alt kısım: Coin değiştirme -->
+            <div class="swap-section">
+                <div class="swap-header">
+                    <h3 class="swap-title">Coin Değiştir</h3>
+                    <p class="swap-desc">Bir coin seçin, ardından matristeki değiştirmek istediğiniz coine tıklayın</p>
+                </div>
+                <div class="swap-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="swap-search-input" placeholder="Coin ara..." autocomplete="off">
+                </div>
+                <div class="swap-grid" id="swap-grid"></div>
+            </div>
+        </section>
+
+        <!-- Değiştirme modal (eski) -->
+        <div id="swap-modal" class="swap-modal hidden">
+            <div class="swap-modal-content">
+                <h4 class="swap-modal-title" id="swap-modal-title">Hangi coin ile değiştirilsin?</h4>
+                <div class="swap-modal-options" id="swap-modal-options"></div>
+                <button class="swap-modal-close" data-close="swap-modal" id="swap-modal-close">İptal</button>
+            </div>
         </div>
-        <div class="header-right">
-            <span class="header-time" id="header-time">--:--:--</span>
-            <span class="header-date" id="header-date">----/--/--</span>
+
+        <!-- Periyot Edit Modalı -->
+        <div id="modal-period" class="swap-modal hidden">
+            <div class="swap-modal-content">
+                <h4 class="swap-modal-title">Periyodu Değiştir</h4>
+                <div class="swap-modal-options">
+                    <button class="swap-option period-opt" data-period="6h">6 Saat</button>
+                    <button class="swap-option period-opt" data-period="1d">1 Gün</button>
+                    <button class="swap-option period-opt" data-period="7d">7 Gün</button>
+                    <button class="swap-option period-opt" data-period="30d">30 Gün</button>
+                </div>
+                <button class="swap-modal-close" data-close="modal-period">İptal</button>
+            </div>
         </div>
-    </header>
 
-    <!-- ═══════════════════════════════════════════════ -->
-    <!--  ANA İÇERİK                                    -->
-    <!-- ═══════════════════════════════════════════════ -->
-    <main id="main-content">
+        <!-- Matrix Size Edit Modalı -->
+        <div id="modal-matrix-size" class="swap-modal hidden">
+            <div class="swap-modal-content">
+                <h4 class="swap-modal-title">Yeni Matris Boyutu Seçin</h4>
+                <div class="swap-modal-options">
+                    <button class="swap-option size-opt" data-size="4">4×4</button>
+                    <button class="swap-option size-opt" data-size="5">5×5</button>
+                    <button class="swap-option size-opt" data-size="6">6×6</button>
+                    <button class="swap-option size-opt" data-size="7">7×7</button>
+                    <button class="swap-option size-opt" data-size="8">8×8</button>
+                    <button class="swap-option size-opt" data-size="9">9×9</button>
+                    <button class="swap-option size-opt" data-size="10">10×10</button>
+                </div>
+                <button class="swap-modal-close" data-close="modal-matrix-size">İptal</button>
+            </div>
+        </div>
 
-        <!-- Bilgi panelleri -->
-        <section id="info-panels">
-            <div class="info-card" id="card-coins">
-                <div class="info-card-icon">◈</div>
-                <div class="info-card-body">
-                    <span class="info-card-label">Analiz Edilen Coinler</span>
-                    <span class="info-card-value" id="coin-count">—</span>
+        <!-- Matris Küçültme (Çıkarma) Modalı -->
+        <div id="modal-matrix-reduce" class="swap-modal hidden">
+            <div class="swap-modal-content">
+                <h4 class="swap-modal-title" id="reduce-title">Çıkarılacak Olan Coini Seçin</h4>
+                <div id="reduce-options" style="gap:8px; display:flex; flex-direction:column; align-items:stretch; max-height:260px; overflow-y:auto; padding-right:5px; margin-bottom:8px"></div>
+                <div class="action-row" style="margin-top:16px; width:100%; justify-content:stretch;">
+                    <button class="btn-primary" id="btn-confirm-reduce" style="width:100%; padding:12px;" disabled>Onayla ve Uygula</button>
                 </div>
+                <button class="swap-modal-close" data-close="modal-matrix-reduce" style="margin-top:8px;">İptal</button>
             </div>
-            <div class="info-card" id="card-period">
-                <div class="info-card-icon">◷</div>
-                <div class="info-card-body">
-                    <span class="info-card-label">Veri Periyodu</span>
-                    <span class="info-card-value" id="data-period">—</span>
-                </div>
-            </div>
-            <div class="info-card" id="card-method">
-                <div class="info-card-icon">∑</div>
-                <div class="info-card-body">
-                    <span class="info-card-label">Korelasyon Metodu</span>
-                    <span class="info-card-value">Pearson</span>
-                </div>
-            </div>
-            <div class="info-card" id="card-source">
-                <div class="info-card-icon">⬡</div>
-                <div class="info-card-body">
-                    <span class="info-card-label">Veri Kaynağı</span>
-                    <span class="info-card-value">Binance API</span>
-                </div>
-            </div>
-        </section>
+        </div>
 
-        <!-- Yükleme animasyonu -->
-        <section id="loader-container">
-            <div class="loader-wrapper">
-                <div class="loader-ring">
-                    <div class="loader-ring-inner"></div>
+        <!-- Matris Büyütme (Ekleme) Modalı -->
+        <div id="modal-matrix-increase" class="swap-modal hidden">
+            <div class="swap-modal-content" style="max-width:440px; width:100%;">
+                <h4 class="swap-modal-title" id="increase-title">Eklenecek Coini Seçin</h4>
+                <div class="swap-search" style="max-width:100%;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="increase-search-input" placeholder="Coin ara..." autocomplete="off">
                 </div>
-                <div class="loader-grid">
-                    <div class="grid-cell"></div>
-                    <div class="grid-cell"></div>
-                    <div class="grid-cell"></div>
-                    <div class="grid-cell"></div>
-                    <div class="grid-cell"></div>
-                    <div class="grid-cell"></div>
-                    <div class="grid-cell"></div>
-                    <div class="grid-cell"></div>
-                    <div class="grid-cell"></div>
+                <div class="swap-grid" id="increase-grid" style="max-height:200px; margin-bottom:16px;"></div>
+                <div class="action-row" style="margin-top:16px; width:100%; justify-content:stretch;">
+                    <button class="btn-primary" id="btn-confirm-increase" style="width:100%; padding:12px;" disabled>Onayla ve Analiz Et</button>
                 </div>
-                <p class="loader-text" id="loader-text">Sistem Başlatılıyor...</p>
-                <div class="loader-progress-bar">
-                    <div class="loader-progress-fill" id="loader-progress"></div>
-                </div>
-                <p class="loader-subtext" id="loader-subtext">Binance API'ye bağlanılıyor</p>
+                <button class="swap-modal-close" data-close="modal-matrix-increase" style="margin-top:8px;">İptal</button>
             </div>
-        </section>
-
-        <!-- Isı haritası alanı -->
-        <section id="heatmap-section" class="hidden">
-            <div class="section-header">
-                <h1>
-                    <span class="section-icon">▣</span>
-                    Pearson Korelasyon Matrisi
-                </h1>
-                <div class="section-actions">
-                    <button id="btn-refresh" class="action-btn" title="Verileri Yenile">
-                        <span class="btn-icon">↻</span> Yenile
-                    </button>
-                </div>
-            </div>
-            <div id="heatmap-chart"></div>
-
-            <!-- Korelasyon açıklama skalası -->
-            <div class="correlation-legend">
-                <div class="legend-item">
-                    <span class="legend-color" style="background: #ff1744;"></span>
-                    <span class="legend-label">−1.0 Güçlü Negatif</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background: #1a1a2e;"></span>
-                    <span class="legend-label">0.0 Korelasyon Yok</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background: #00e5ff;"></span>
-                    <span class="legend-label">+1.0 Güçlü Pozitif</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- İstatistik tablosu -->
-        <section id="stats-section" class="hidden">
-            <div class="section-header">
-                <h2>
-                    <span class="section-icon">◉</span>
-                    Detaylı Korelasyon İstatistikleri
-                </h2>
-            </div>
-            <div class="stats-grid" id="stats-grid">
-                <!-- JavaScript ile doldurulacak -->
-            </div>
-        </section>
-
-        <!-- Log konsolu -->
-        <section id="console-section">
-            <div class="console-header">
-                <span class="console-title">› KONSOL ÇIKTISI</span>
-                <span class="console-status" id="console-status">HAZIR</span>
-            </div>
-            <div class="console-body" id="console-body">
-                <p class="console-line">[SİSTEM] Terminal başlatıldı...</p>
-            </div>
-        </section>
+        </div>
 
     </main>
 
-    <!-- Alt bar -->
-    <footer id="terminal-footer">
-        <span>CRYPTO CORRELATION TERMINAL v2.0</span>
-        <span id="footer-status">● Çevrimdışı</span>
+    <footer id="app-footer">
+        <span>CryptoCorr Heatmap © 2026</span>
+        <span>Binance Public API</span>
     </footer>
 
-    <!-- Ana JavaScript dosyası -->
     <script src="script.js"></script>
 </body>
 </html>
