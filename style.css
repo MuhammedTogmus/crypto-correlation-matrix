@@ -200,3 +200,8 @@ body{font-family:var(--font);background:var(--bg-body);color:var(--text-1);min-h
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
 ::selection{background:rgba(252,213,53,0.2);color:var(--text-1)}
+
+/* Plotly Modebar Styling for Dark Theme */
+.modebar-btn svg { fill: var(--text-3) !important; transition: fill var(--ease); }
+.modebar-btn:hover svg { fill: var(--accent) !important; }
+.modebar { background: transparent !important; }

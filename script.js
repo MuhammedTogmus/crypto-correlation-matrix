@@ -244,30 +244,54 @@ function renderHeatmap(matrix) {
     const coins = STATE.selectedCoins, n = coins.length;
     const theme = CONFIG.themes[STATE.theme];
     const annots = [];
+    const isMobile = window.innerWidth < 768;
+    
+    // Mobil/PC Yükseklik Farkı
+    const chartHeight = isMobile 
+        ? (n <= 5 ? 360 : (n <= 8 ? 400 : 440)) 
+        : (n <= 5 ? 440 : (n <= 8 ? 520 : 580));
+
     for(let i=0;i<n;i++) for(let j=0;j<n;j++) {
+        let fontSize = isMobile 
+            ? (n<=4 ? 12 : (n<=6 ? 10 : (n<=8 ? 8 : 7)))
+            : (n<=4 ? 16 : (n<=6 ? 14 : (n<=8 ? 12 : 10)));
+
         annots.push({
             x:coins[j],y:coins[i],text:matrix[i][j].toFixed(2),showarrow:false,
-            font:{family:'Space Grotesk',size:n<=5?15:(n<=7?12:10),
-                  color:STATE.theme==='classic'?(Math.abs(matrix[i][j])>0.3?'#263238':'#78909C'):(Math.abs(matrix[i][j])>0.5?'#eaecef':'#848e9c'),weight:700}
+            font:{
+                family:'Space Grotesk',
+                size: fontSize,
+                color:STATE.theme==='classic'?(Math.abs(matrix[i][j])>0.3?'#263238':'#78909C'):(Math.abs(matrix[i][j])>0.5?'#eaecef':'#848e9c'),
+                weight:700
+            }
         });
     }
+
     Plotly.newPlot(DOM.heatmapChart, [{
         z:matrix,x:coins,y:coins,type:'heatmap',colorscale:theme.scale,
         zmin:-1,zmax:1,showscale:true,hoverongaps:false,
         hovertemplate:'<b>%{y} ↔ %{x}</b><br>r = <b>%{z:.4f}</b><extra></extra>',
-        colorbar:{title:{text:'r',font:{family:'Space Grotesk',size:12,color:'#848e9c'},side:'right'},
-            tickfont:{family:'Space Grotesk',size:10,color:'#848e9c'},
+        colorbar:{title:{text:'r',font:{family:'Space Grotesk',size:isMobile?10:12,color:'#848e9c'},side:'right'},
+            tickfont:{family:'Space Grotesk',size:isMobile?9:10,color:'#848e9c'},
             tickvals:[-1,-.5,0,.5,1],ticktext:['-1.0','-0.5','0.0','+0.5','+1.0'],
             len:.85,thickness:10,outlinewidth:0,bgcolor:'rgba(0,0,0,0)'}
     }], {
         annotations:annots,
-        xaxis:{side:'bottom',tickfont:{family:'Space Grotesk',size:n<=6?13:11,color:'#eaecef',weight:700},tickangle:0,gridcolor:'rgba(43,49,57,0.5)',linecolor:'#2b3139'},
-        yaxis:{autorange:'reversed',tickfont:{family:'Space Grotesk',size:n<=6?13:11,color:'#eaecef',weight:700},gridcolor:'rgba(43,49,57,0.5)',linecolor:'#2b3139'},
+        dragmode: false, // Mobilde sayfanın scroll olmasını engellemez! Seçim (box/pan) devre dışı.
+        xaxis:{side:'bottom',tickfont:{family:'Space Grotesk',size:n<=6?12:(n<=8?10:8),color:'#eaecef',weight:700},tickangle:isMobile?-45:0,gridcolor:'rgba(43,49,57,0.5)',linecolor:'#2b3139'},
+        yaxis:{autorange:'reversed',tickfont:{family:'Space Grotesk',size:n<=6?12:(n<=8?10:8),color:'#eaecef',weight:700},gridcolor:'rgba(43,49,57,0.5)',linecolor:'#2b3139'},
         paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
-        margin:{l:50,r:60,t:16,b:40},
-        height:n<=5?420:(n<=7?480:(n<=8?540:600)),
-        font:{family:'Inter'}
-    }, {responsive:true,displayModeBar:false});
+        margin:{l:isMobile?(n>6?40:50):50, r:isMobile?40:60, t:16, b:isMobile?50:40},
+        height: chartHeight,
+        font:{family:'Inter'},
+        autosize: true
+    }, {
+        responsive: true, 
+        displayModeBar: true, 
+        displaylogo: false, 
+        scrollZoom: false, // Mobilde sayfanın tamamen kilitlenmesi (scroll trap) iptal! Zoom sadece UI butonlarla yapılacak.
+        modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'autoScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'toggleSpikelines']
+    });
     DOM.scaleGradient.style.background = theme.gradient;
     DOM.resultCoinsLabel.textContent = coins.join(' • ') + ` — Son ${CONFIG.periodMap[STATE.period].label}`;
 }
@@ -340,6 +364,12 @@ function showSelector() {
     DOM.initialLoader.classList.add('hidden');DOM.analysisLoader.classList.add('hidden');DOM.resultsSection.classList.add('hidden');
     DOM.coinSelector.classList.remove('hidden');
     DOM.navStatus.className='nav-status live';DOM.navStatus.innerHTML='<span class="status-dot"></span>Hazır';
+    
+    // Matris ve Periyot düzenleme ikonlarını gizle
+    DOM.cardMatrix.classList.remove('interactive');
+    DOM.cardPeriod.classList.remove('interactive');
+    DOM.cardMatrix.querySelector('.edit-icon').style.display = 'none';
+    DOM.cardPeriod.querySelector('.edit-icon').style.display = 'none';
 }
 function showAnalysisLoader() {
     DOM.coinSelector.classList.add('hidden');DOM.resultsSection.classList.add('hidden');
@@ -354,6 +384,12 @@ function showResults() {
     DOM.displayPeriod.textContent=CONFIG.periodMap[STATE.period].label;
     DOM.navStatus.className='nav-status live';DOM.navStatus.innerHTML='<span class="status-dot"></span>Veriler Güncel';
     renderSwapGrid();
+    
+    // Matris ve Periyot düzenleme ikonlarını göster
+    DOM.cardMatrix.classList.add('interactive');
+    DOM.cardPeriod.classList.add('interactive');
+    DOM.cardMatrix.querySelector('.edit-icon').style.display = 'inline';
+    DOM.cardPeriod.querySelector('.edit-icon').style.display = 'inline';
 }
 
 // ═══ Ana Akış ═══
@@ -417,10 +453,12 @@ document.addEventListener('DOMContentLoaded', () => initApp());
 // ═══ METRIC CARD MODALLAR ═══
 // Matris modalını aç
 DOM.cardMatrix.addEventListener('click', () => {
+    if(!DOM.cardMatrix.classList.contains('interactive')) return;
     DOM.modalMatrixSize.classList.remove('hidden');
 });
 // Periyot modalını aç
 DOM.cardPeriod.addEventListener('click', () => {
+    if(!DOM.cardPeriod.classList.contains('interactive')) return;
     DOM.modalPeriod.classList.remove('hidden');
 });
 
