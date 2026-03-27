@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kripto para korelasyon ısı haritası - Pearson korelasyon analizi ile top coinlerin ilişki matrisi">
+    <title>Kripto Korelasyon Isı Haritası | Finansal Analiz Terminali</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Plotly.js CDN -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <!-- Stil dosyası -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--  ÜST BAR - Terminal başlık çubuğu              -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <header id="terminal-header">
+        <div class="header-left">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <span class="terminal-title">CRYPTO CORRELATION TERMINAL</span>
+        </div>
+        <div class="header-center">
+            <span class="header-badge" id="status-badge">
+                <span class="pulse-dot"></span>
+                BAĞLANTI BEKLENİYOR
+            </span>
+        </div>
+        <div class="header-right">
+            <span class="header-time" id="header-time">--:--:--</span>
+            <span class="header-date" id="header-date">----/--/--</span>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--  ANA İÇERİK                                    -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <main id="main-content">
+
+        <!-- Bilgi panelleri -->
+        <section id="info-panels">
+            <div class="info-card" id="card-coins">
+                <div class="info-card-icon">◈</div>
+                <div class="info-card-body">
+                    <span class="info-card-label">Analiz Edilen Coinler</span>
+                    <span class="info-card-value" id="coin-count">—</span>
+                </div>
+            </div>
+            <div class="info-card" id="card-period">
+                <div class="info-card-icon">◷</div>
+                <div class="info-card-body">
+                    <span class="info-card-label">Veri Periyodu</span>
+                    <span class="info-card-value" id="data-period">—</span>
+                </div>
+            </div>
+            <div class="info-card" id="card-method">
+                <div class="info-card-icon">∑</div>
+                <div class="info-card-body">
+                    <span class="info-card-label">Korelasyon Metodu</span>
+                    <span class="info-card-value">Pearson</span>
+                </div>
+            </div>
+            <div class="info-card" id="card-source">
+                <div class="info-card-icon">⬡</div>
+                <div class="info-card-body">
+                    <span class="info-card-label">Veri Kaynağı</span>
+                    <span class="info-card-value">Binance API</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yükleme animasyonu -->
+        <section id="loader-container">
+            <div class="loader-wrapper">
+                <div class="loader-ring">
+                    <div class="loader-ring-inner"></div>
+                </div>
+                <div class="loader-grid">
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                </div>
+                <p class="loader-text" id="loader-text">Sistem Başlatılıyor...</p>
+                <div class="loader-progress-bar">
+                    <div class="loader-progress-fill" id="loader-progress"></div>
+                </div>
+                <p class="loader-subtext" id="loader-subtext">Binance API'ye bağlanılıyor</p>
+            </div>
+        </section>
+
+        <!-- Isı haritası alanı -->
+        <section id="heatmap-section" class="hidden">
+            <div class="section-header">
+                <h1>
+                    <span class="section-icon">▣</span>
+                    Pearson Korelasyon Matrisi
+                </h1>
+                <div class="section-actions">
+                    <button id="btn-refresh" class="action-btn" title="Verileri Yenile">
+                        <span class="btn-icon">↻</span> Yenile
+                    </button>
+                </div>
+            </div>
+            <div id="heatmap-chart"></div>
+
+            <!-- Korelasyon açıklama skalası -->
+            <div class="correlation-legend">
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #ff1744;"></span>
+                    <span class="legend-label">−1.0 Güçlü Negatif</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #1a1a2e;"></span>
+                    <span class="legend-label">0.0 Korelasyon Yok</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #00e5ff;"></span>
+                    <span class="legend-label">+1.0 Güçlü Pozitif</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- İstatistik tablosu -->
+        <section id="stats-section" class="hidden">
+            <div class="section-header">
+                <h2>
+                    <span class="section-icon">◉</span>
+                    Detaylı Korelasyon İstatistikleri
+                </h2>
+            </div>
+            <div class="stats-grid" id="stats-grid">
+                <!-- JavaScript ile doldurulacak -->
+            </div>
+        </section>
+
+        <!-- Log konsolu -->
+        <section id="console-section">
+            <div class="console-header">
+                <span class="console-title">› KONSOL ÇIKTISI</span>
+                <span class="console-status" id="console-status">HAZIR</span>
+            </div>
+            <div class="console-body" id="console-body">
+                <p class="console-line">[SİSTEM] Terminal başlatıldı...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Alt bar -->
+    <footer id="terminal-footer">
+        <span>CRYPTO CORRELATION TERMINAL v2.0</span>
+        <span id="footer-status">● Çevrimdışı</span>
+    </footer>
+
+    <!-- Ana JavaScript dosyası -->
+    <script src="script.js"></script>
+</body>
+</html>
