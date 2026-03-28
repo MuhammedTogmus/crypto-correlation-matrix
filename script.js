@@ -107,6 +107,28 @@ const MODAL_STATE = {
     tempIncreaseSelection: []
 };
 
+// ═══ LOCAL STORAGES ═══
+const LS_KEY = 'cryptoCorrState';
+function saveStateToLocal() {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+        selectedCoins: STATE.selectedCoins,
+        matrixSize: STATE.matrixSize,
+        period: STATE.period,
+        theme: STATE.theme
+    }));
+}
+function loadStateFromLocal() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(LS_KEY));
+        if(saved && saved.matrixSize) {
+            STATE.selectedCoins = saved.selectedCoins || [];
+            STATE.matrixSize = saved.matrixSize || 5;
+            STATE.period = saved.period || '30d';
+            STATE.theme = saved.theme || 'ocean';
+        }
+    } catch(e) { console.error("Storage err:", e); }
+}
+
 // ═══ Yardımcılar ═══
 function log(m, t = 'log') { const ts = new Date().toLocaleTimeString('tr-TR'); console[t](`[CryptoCorr ${ts}]`, m); }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -174,6 +196,7 @@ function updateSelectionUI() {
         el.classList.toggle('selected', sel);
         el.classList.toggle('disabled', c >= m && !sel);
     });
+    saveStateToLocal();
 }
 
 function renderChips() {
@@ -344,6 +367,7 @@ async function executeSwap(oldCoin, newCoin) {
     if (idx === -1) return;
     STATE.selectedCoins[idx] = newCoin;
     log(`Swap: ${oldCoin} → ${newCoin}`);
+    saveStateToLocal();
     // Yeniden analiz
     await runAnalysis();
 }
@@ -352,6 +376,7 @@ async function executeSwap(oldCoin, newCoin) {
 function setTheme(themeName) {
     STATE.theme = themeName;
     document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === themeName));
+    saveStateToLocal();
     // Eğer matris varsa yeniden çiz
     if (STATE.lastPriceData) {
         const matrix = buildMatrix(STATE.lastPriceData);
@@ -372,12 +397,14 @@ function showSelector() {
     DOM.cardPeriod.querySelector('.edit-icon').style.display = 'none';
 }
 function showAnalysisLoader() {
+    DOM.initialLoader.classList.add('hidden');
     DOM.coinSelector.classList.add('hidden');DOM.resultsSection.classList.add('hidden');
     DOM.analysisLoader.classList.remove('hidden');
     DOM.loaderProgress.style.width='0%';DOM.loaderText.textContent='Veriler Analiz Ediliyor';
     DOM.navStatus.className='nav-status';DOM.navStatus.innerHTML='<span class="status-dot"></span>Analiz...';
 }
 function showResults() {
+    DOM.initialLoader.classList.add('hidden');
     DOM.analysisLoader.classList.add('hidden');DOM.coinSelector.classList.add('hidden');
     DOM.resultsSection.classList.remove('hidden');
     DOM.displayMatrix.textContent=`${STATE.selectedCoins.length}×${STATE.selectedCoins.length}`;
@@ -395,10 +422,25 @@ function showResults() {
 // ═══ Ana Akış ═══
 async function initApp() {
     try {
+        loadStateFromLocal();
         STATE.allCoins = await fetchTop200();
         DOM.initialLoaderProgress.style.width='100%';DOM.initialLoaderText.textContent='Hazır';
         await sleep(300);
-        renderCoinList(STATE.allCoins); renderChips(); updateSelectionUI(); showSelector();
+
+        // UI elemanlarını localStorage state'ine göre ayarla
+        document.querySelectorAll('#matrix-toggles .toggle-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.size) === STATE.matrixSize));
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === STATE.period));
+        document.querySelectorAll('.theme-dot').forEach(b => b.classList.toggle('active', b.dataset.theme === STATE.theme));
+        DOM.displayPeriod.textContent = CONFIG.periodMap[STATE.period].label;
+
+        renderCoinList(STATE.allCoins); renderChips(); updateSelectionUI(); 
+        
+        // Eğer her şey tamsa doğrudan grafiği çizdir
+        if(STATE.selectedCoins.length === STATE.matrixSize && STATE.selectedCoins.length > 0) {
+            runAnalysis();
+        } else {
+            showSelector();
+        }
     } catch(e) {
         log(`Hata: ${e.message}`,'error');
         DOM.initialLoaderText.textContent='Bağlantı Hatası';DOM.initialLoaderSubtext.textContent='5s sonra tekrar...';
@@ -417,9 +459,12 @@ async function runAnalysis() {
         const matrix = buildMatrix(data);
         DOM.loaderProgress.style.width='80%';DOM.loaderText.textContent='Grafik Oluşturuluyor';
         await sleep(100);
-        renderHeatmap(matrix); renderStats(matrix);
+        
         DOM.loaderProgress.style.width='100%';DOM.loaderText.textContent='Tamamlandı';
-        await sleep(300); showResults();
+        // Plotly Fix: Görünür yap ki ölçüleri tam algılasın
+        showResults(); 
+        renderHeatmap(matrix); 
+        renderStats(matrix);
     } catch(e) {
         log(`Hata: ${e.message}`,'error');
         DOM.loaderText.textContent='Başarısız';DOM.loaderSubtext.textContent=e.message;
@@ -435,6 +480,7 @@ document.querySelectorAll('.period-btn').forEach(b => b.addEventListener('click'
     STATE.period=b.dataset.period;
     document.querySelectorAll('.period-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
     DOM.displayPeriod.textContent=CONFIG.periodMap[STATE.period].label;
+    saveStateToLocal();
 }));
 document.querySelectorAll('.theme-dot').forEach(d => d.addEventListener('click', () => setTheme(d.dataset.theme)));
 
@@ -483,6 +529,7 @@ document.querySelectorAll('.period-opt').forEach(btn => {
         const opt = document.querySelector(`.period-btn[data-period="${np}"]`);
         if(opt) opt.classList.add('active');
         DOM.displayPeriod.textContent = CONFIG.periodMap[STATE.period].label;
+        saveStateToLocal();
 
         // Eger sonuctaysak dogrudan calistir
         if(!DOM.resultsSection.classList.contains('hidden')) {
@@ -608,10 +655,10 @@ DOM.btnConfirmIncrease.addEventListener('click', async () => {
                  await sleep(100); // api rate limiti korumak icon
              }
              const m = buildMatrix(STATE.lastPriceData);
+             showResults(); // Gizli div çözümü
              renderHeatmap(m); renderStats(m);
              DOM.displayMatrix.textContent = `${STATE.matrixSize}×${STATE.matrixSize}`;
              renderSwapGrid();
-             showResults();
          } catch(e) {
              log(`Veri hatası: ${e.message}`, 'error');
          }
