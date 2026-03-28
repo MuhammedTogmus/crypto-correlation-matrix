@@ -19,3 +19,4 @@ $$r = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2 \s
 1. Fetches the last 30 days of daily closing prices for major volume coins.
 2. Constructs a correlation matrix.
 3. Renders a color-coded heatmap where `1` indicates perfect positive correlation and `-1` indicates perfect negative correlation.
+<img width="1919" height="908" alt="Ekran görüntüsü 2026-03-28 143250" src="https://github.com/user-attachments/assets/93eda792-d9cd-4c4b-83de-07a513d776f6" />
