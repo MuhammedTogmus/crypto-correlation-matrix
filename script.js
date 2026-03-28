@@ -97,7 +97,10 @@ const DOM = {
     increaseTitle: document.getElementById('increase-title'),
     increaseSearch: document.getElementById('increase-search-input'),
     increaseGrid: document.getElementById('increase-grid'),
-    btnConfirmIncrease: document.getElementById('btn-confirm-increase')
+    btnConfirmIncrease: document.getElementById('btn-confirm-increase'),
+    // Export Butonları
+    btnExportCSV: document.getElementById('btn-export-csv'),
+    btnExportPNG: document.getElementById('btn-export-png')
 };
 
 // Gecici Modal State
@@ -269,10 +272,12 @@ function renderHeatmap(matrix) {
     const annots = [];
     const isMobile = window.innerWidth < 768;
     
-    // Mobil/PC Yükseklik Farkı
+    // Mobil/PC Yükseklik ve Genişlik (Yatay Scroll)
     const chartHeight = isMobile 
         ? (n <= 5 ? 360 : (n <= 8 ? 400 : 440)) 
         : (n <= 5 ? 440 : (n <= 8 ? 520 : 580));
+        
+    const chartWidth = isMobile && n > 4 ? Math.max(window.innerWidth, n * 55 + 80) : undefined;
 
     for(let i=0;i<n;i++) for(let j=0;j<n;j++) {
         let fontSize = isMobile 
@@ -306,8 +311,9 @@ function renderHeatmap(matrix) {
         paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
         margin:{l:isMobile?(n>6?40:50):50, r:isMobile?40:60, t:16, b:isMobile?50:40},
         height: chartHeight,
+        width: chartWidth,
         font:{family:'Inter'},
-        autosize: true
+        autosize: !chartWidth
     }, {
         responsive: true, 
         displayModeBar: true, 
@@ -448,8 +454,20 @@ async function initApp() {
     }
 }
 
+let apiCooldown = false;
+
 async function runAnalysis() {
-    if(STATE.isAnalyzing) return; STATE.isAnalyzing=true;
+    if(STATE.isAnalyzing || apiCooldown) return; 
+    STATE.isAnalyzing = true;
+    apiCooldown = true;
+
+    // Sistem meşgulken UI etkileşimlerini kilitle
+    const interactionBtns = [DOM.btnRefresh, DOM.btnAnalyze];
+    document.querySelectorAll('.period-opt, .period-btn').forEach(b => interactionBtns.push(b));
+    interactionBtns.forEach(b => { if(b) b.disabled = true; });
+    DOM.cardPeriod.style.pointerEvents = 'none';
+    DOM.cardMatrix.style.pointerEvents = 'none';
+
     try {
         showAnalysisLoader(); await sleep(150);
         const data = await fetchSelectedData();
@@ -469,7 +487,17 @@ async function runAnalysis() {
         log(`Hata: ${e.message}`,'error');
         DOM.loaderText.textContent='Başarısız';DOM.loaderSubtext.textContent=e.message;
         await sleep(2000); showSelector();
-    } finally { STATE.isAnalyzing=false; }
+    } finally { 
+        STATE.isAnalyzing=false; 
+        
+        // 2 Saniyelik Debounce/Rate-Limit süresi sonrası kilitleri aç
+        setTimeout(() => {
+            apiCooldown = false;
+            interactionBtns.forEach(b => { if(b) b.disabled = false; });
+            DOM.cardPeriod.style.pointerEvents = 'auto';
+            DOM.cardMatrix.style.pointerEvents = 'auto';
+        }, 2000);
+    }
 }
 
 // ═══ Event Listeners ═══
@@ -659,8 +687,39 @@ DOM.btnConfirmIncrease.addEventListener('click', async () => {
              renderHeatmap(m); renderStats(m);
              DOM.displayMatrix.textContent = `${STATE.matrixSize}×${STATE.matrixSize}`;
              renderSwapGrid();
+             saveStateToLocal();
          } catch(e) {
              log(`Veri hatası: ${e.message}`, 'error');
          }
     }
+});
+
+// ═══ Dışa Aktar (Export) Fonksiyonları ═══
+
+if(DOM.btnExportCSV) DOM.btnExportCSV.addEventListener('click', () => {
+    if(!STATE.lastPriceData || !STATE.selectedCoins.length) return;
+    const coins = STATE.selectedCoins;
+    let csv = "Coin\\Coin," + coins.join(",") + "\n";
+    const matrix = buildMatrix(STATE.lastPriceData);
+    for(let i=0; i<coins.length; i++){
+        csv += coins[i] + "," + matrix[i].map(v => v.toFixed(4)).join(",") + "\n";
+    }
+    const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Korelasyon_Matrisi_${STATE.period}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    log('CSV dosyası dışa aktarıldı.', 'log');
+});
+
+if(DOM.btnExportPNG) DOM.btnExportPNG.addEventListener('click', () => {
+    if(!STATE.lastPriceData) return;
+    Plotly.downloadImage(DOM.heatmapChart, {
+        format: 'png',
+        width: window.innerWidth < 768 ? 800 : 1200,
+        height: window.innerWidth < 768 ? 800 : 1200,
+        filename: `Korelasyon_Matrisi_${STATE.period}_${new Date().toISOString().split('T')[0]}`
+    });
+    log('PNG olarak indirildi.', 'log');
 });
