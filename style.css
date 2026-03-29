@@ -26,6 +26,18 @@ body{font-family:var(--font);background:var(--bg-body);color:var(--text-1);min-h
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 .nav-right{font-size:.85rem;color:var(--text-3)}
 
+/* LIVE TOGGLE */
+.live-toggle-container { display: flex; align-items: center; gap: 8px; cursor: pointer; background: var(--bg-surface); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--border); transition: var(--ease); }
+.live-toggle-container:hover { border-color: var(--border-light); }
+.live-status-text { font-size: 0.75rem; font-weight: 700; color: var(--text-3); font-family: var(--font-display); transition: var(--ease); }
+.live-status-text.active { color: var(--green); text-shadow: 0 0 10px rgba(14, 203, 129, 0.3); }
+.toggle-switch { position: relative; width: 34px; height: 18px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-card); transition: .3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 18px; border: 1px solid var(--border); }
+.slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: var(--text-3); transition: .3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 50%; }
+input:checked + .slider { background-color: rgba(14, 203, 129, 0.15); border-color: var(--green); }
+input:checked + .slider:before { transform: translateX(16px); background-color: var(--green); box-shadow: 0 0 8px var(--green); }
+
 /* APP */
 #app{flex:1;max-width:1600px;width:100%;margin:0 auto;padding:16px 24px}
 

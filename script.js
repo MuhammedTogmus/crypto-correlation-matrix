@@ -9,6 +9,8 @@ const I18N = {
         nav_risk: "🛡️ Risk Test",
         nav_read: "i",
         nav_how: "How to Read?",
+        live_on: "Live: ON",
+        live_off: "Live: OFF",
         metric_src: "Source",
         metric_mat: "Matrix",
         metric_per: "Period",
@@ -124,6 +126,8 @@ const I18N = {
         nav_risk: "🛡️ Risk Testi",
         nav_read: "i",
         nav_how: "Nasıl Okunur?",
+        live_on: "Live: AÇIK",
+        live_off: "Live: KAPALI",
         metric_src: "Kaynak",
         metric_mat: "Matris",
         metric_per: "Periyot",
@@ -145,7 +149,7 @@ const I18N = {
         btn_refresh: "↻ Yenile",
         side_corr: "Korelasyon Değerleri",
         ai_title: "🤖 AI Fırsat Avcısı",
-        ai_desc: "Korelasyon anomalilerini ve "${t("shp_med")}lamaya Dönüş" (Mean Reversion) fırsatlarını anında yakalar. <b>Zaman Makinesi (Backtest)</b> ile tarihsel kanıt sunar.",
+        ai_desc: "Korelasyon anomalilerini ve \"Ortalamaya Dönüş\" (Mean Reversion) fırsatlarını anında yakalar. <b>Zaman Makinesi (Backtest)</b> ile tarihsel kanıt sunar.",
         ai_locked: "Fırsat Avcısı & Zaman Makinesi Kilitli",
         ai_locked_sub: "Algoritmik Al/Sat sinyallerini, Backtest sonuçlarını ve anomalileri görmek için Premium'a geçin.",
         btn_unlock: "Aylık $29.99 - Kilidi Aç",
@@ -181,7 +185,7 @@ const I18N = {
         btn_set_alarm: "🔔 Alarm Kur ve Arka Planda İzle",
         alarm_watch: "Aktif İzleme Listesi (Watchlist)",
         alarm_scan: "Taranıyor",
-        alarm_empty: "t('alarm_empty'). Yukarıdan ilk alarmınızı ekleyin.",
+        alarm_empty: "Henüz alarm kurulmadı. Yukarıdan ilk alarmınızı ekleyin.",
         shock_banner: "Hacim Şoku tespit edildi — Matris üzerinde neon sarı ile vurgulanıyor.",
         stat_loading: "Veriler Alınıyor...",
         stat_ready: "Hazır",
@@ -191,31 +195,31 @@ const I18N = {
         backtest_badge: "✅ Tarihsel Başarı (Backtest)",
         backtest_badge_err: "📊 Backtest: Sinyal Yetersiz",
         hedge_badge: "🛡️ Tarihsel Koruma (Backtest)",
-        bt_engine: "${t("bt_engine")}",
-        bt_engine_h: "${t("bt_engine_h")}",
+        bt_engine: "🤖 Zaman Makinesi — Mean Reversion Z-Score Algoritması",
+        bt_engine_h: "🤖 Zaman Makinesi — Hedge Backtest Motoru",
         bt_period: "📅 Son {p}",
-        bt_s_tot: "${t("bt_s_tot")}",
-        bt_s_win: "${t("bt_s_win")}",
-        bt_s_loss: "${t("bt_s_loss")}",
-        bt_s_rate: "${t("bt_s_rate")}",
-        bt_s_ret: "${t("bt_s_ret")}",
-        bt_s_cum: "${t("bt_s_cum")}",
-        bt_s_dd: "${t("bt_s_dd")}",
-        bt_s_tot_h: "${t("bt_s_tot_h")}",
-        bt_s_win_h: "${t("bt_s_win_h")}",
-        bt_s_loss_h: "${t("bt_s_loss_h")}",
-        bt_s_rate_h: "${t("bt_s_rate_h")}",
-        bt_s_ret_h: "${t("bt_s_ret_h")}",
-        bt_s_cum_h: "${t("bt_s_cum_h")}",
+        bt_s_tot: "Toplam Sinyal",
+        bt_s_win: "Kazanan",
+        bt_s_loss: "Kaybeden",
+        bt_s_rate: "Başarı Oranı",
+        bt_s_ret: "Ort. Getiri / İşlem",
+        bt_s_cum: "Kümülatif Getiri",
+        bt_s_dd: "Max Düşüş (DD)",
+        bt_s_tot_h: "Toplam Senaryo",
+        bt_s_win_h: "Başarılı Koruma",
+        bt_s_loss_h: "Yetersiz Koruma",
+        bt_s_rate_h: "Koruma Oranı",
+        bt_s_ret_h: "Ort. Azaltma / Çöküş",
+        bt_s_cum_h: "Toplam Koruma",
         bt_ex_str: "🏆 Max Seri: <b>{v}</b> ardışık",
         bt_ex_shp: "📊 Sharpe: <b>{v}</b> ({l})",
-        bt_ex_bst: "⚡ En ${t("shp_good")}: <b>+{v}%</b>",
+        bt_ex_bst: "⚡ En İyi: <b>+{v}%</b>",
         bt_ex_wrst: "💀 En Kötü: <b>{v}%</b>",
         opp_pair: "🟢 Çift İşlemi (Pairs Trading) Fırsatı: {p}",
         opp_hedge: "🔴 Açığa Satış / Hedge Fırsatı: {p}",
-        opp_none_lbl: "${t("opp_none_lbl")}",
-        opp_none: "${t("opp_none")}",
-        shp_exc: "${t("shp_exc")}", shp_good: "${t("shp_good")}", shp_med: "${t("shp_med")}", shp_low: "${t("shp_low")}",
+        opp_none_lbl: "Anomali Taraması Tamamlandı",
+        opp_none: "Seçili matriste şu an için agresif bir korelasyon kopması veya arbitraj fırsatı tespit edilmedi. Daha geniş bir periyot veya farklı coinler deneyebilirsiniz.",
+        shp_exc: "Mükemmel", shp_good: "İyi", shp_med: "Orta", shp_low: "Düşük",
         info_pearson: "Pearson Korelasyonu Nedir?",
         info_pearson_desc: "Bu ısı haritası, kripto paraların fiyat hareketlerinin birbirlerine olan benzerliğini <b>-1.0</b> ile <b>+1.0</b> arasında ölçer.",
         info_1: "+1.0 (Güçlü Pozitif)",
@@ -501,10 +505,14 @@ const STATE = {
     allCoins: [],
     isAnalyzing: false,
     lastPriceData: null,
-    pendingSwapCoin: null  // Swap için bekleyen yeni coin
+    pendingSwapCoin: null,
+    isLive: false,
+    liveIntervalRef: null
 };
 
 const DOM = {
+    liveToggle: document.getElementById('live-data-toggle'),
+    liveText: document.getElementById('live-text'),
     displayMatrix: document.getElementById('display-matrix'),
     displayPeriod: document.getElementById('display-period'),
     navStatus: document.getElementById('nav-status'),
@@ -588,6 +596,7 @@ function loadStateFromURL() {
     if(params.has('period')) { STATE.period = params.get('period'); loaded = true; }
     if(params.has('theme')) { STATE.theme = params.get('theme'); loaded = true; }
     if(params.has('matrix')) { STATE.matrixSize = parseInt(params.get('matrix')); loaded = true; }
+    if(params.has('live')) { STATE.isLive = params.get('live') === 'true'; }
     
     if(loaded && !params.has('matrix')) STATE.matrixSize = Math.max(5, STATE.selectedCoins.length);
     return loaded;
@@ -598,7 +607,8 @@ function saveStateToLocal() {
         selectedCoins: STATE.selectedCoins,
         matrixSize: STATE.matrixSize,
         period: STATE.period,
-        theme: STATE.theme
+        theme: STATE.theme,
+        isLive: STATE.isLive
     }));
     updateURLParameters();
 }
@@ -611,6 +621,7 @@ function loadStateFromLocal() {
             STATE.matrixSize = saved.matrixSize || 5;
             STATE.period = saved.period || '30d';
             STATE.theme = saved.theme || 'ocean';
+            STATE.isLive = saved.isLive || false;
         }
     } catch(e) { console.error("Storage err:", e); }
 }
@@ -670,6 +681,33 @@ function renderCoinList(coins) {
         if (coin.isPremium) {
             el.innerHTML = `<span class="coin-rank" style="color:var(--accent);font-weight:700">${coin.rank}</span><span class="coin-symbol">${coin.symbol} <span style="font-size:0.6rem;opacity:0.6">(${coin.name})</span></span><span class="coin-vol" style="margin-left:auto;color:var(--accent)">🔒 PRO</span>`;
             el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else if (coin.isCustomSearch) {
+            el.innerHTML = `<span class="coin-symbol" style="width:100%; text-align:center; display:flex; justify-content:center; align-items:center; gap:6px;"><span>🔍</span> <b>${coin.symbol}</b> API'de Ara</span>`;
+            el.style.background = "var(--accent-dim)";
+            el.style.color = "var(--accent)";
+            el.style.border = "1px solid var(--accent-hover)";
+            el.addEventListener('click', async () => {
+                const prevHTML = el.innerHTML;
+                el.innerHTML = `<span class="spinner" style="width:14px;height:14px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:6px"></span> <span style="vertical-align:middle">Aranıyor...</span>`;
+                try {
+                    const res = await fetch(`${CONFIG.baseUrl}/ticker/24hr?symbol=${coin.symbol}USDT`);
+                    if(!res.ok) throw new Error('Not found');
+                    const data = await res.json();
+                    
+                    const newCoin = { symbol: coin.symbol, quoteVolume: parseFloat(data.quoteVolume), rank: 'YENİ' };
+                    STATE.allCoins.unshift(newCoin);
+                    if (STATE.selectedCoins.length < STATE.matrixSize) STATE.selectedCoins.push(newCoin.symbol);
+                    updateSelectionUI();
+                    
+                    DOM.coinSearchInput.value = '';
+                    filterCoinList('');
+                } catch(e) {
+                    el.innerHTML = `<span style="color:var(--red);width:100%;text-align:center">❌ Bulunamadı</span>`;
+                    el.style.borderColor = "var(--red)";
+                    el.style.background = "rgba(246, 70, 93, 0.1)";
+                    setTimeout(() => { if(el.parentElement) { el.innerHTML = prevHTML; el.style.borderColor="var(--accent-hover)"; el.style.background="var(--accent-dim)"; } }, 2000);
+                }
+            });
         } else {
             if (STATE.selectedCoins.length >= STATE.matrixSize && !STATE.selectedCoins.includes(coin.symbol)) el.classList.add('disabled');
             el.innerHTML = `<span class="coin-rank">#${coin.rank}</span><span class="coin-symbol">${coin.symbol}</span><span class="coin-vol">$${fmtVol(coin.quoteVolume)}</span><span class="coin-check">✓</span>`;
@@ -716,7 +754,17 @@ function renderChips() {
 
 function filterCoinList(q) {
     q = q.trim().toUpperCase();
-    renderCoinList(q ? STATE.allCoins.filter(c => c.symbol.includes(q)) : STATE.allCoins);
+    let filtered = q ? STATE.allCoins.filter(c => c.symbol.includes(q)) : [...STATE.allCoins];
+    
+    // Gelişmiş Coin Arama Motoru Enjeksiyonu
+    if(q && q.length >= 2 && q.length <= 10) {
+        const exactMatch = STATE.allCoins.find(c => c.symbol === q);
+        if(!exactMatch) {
+            filtered.unshift({ symbol: q, isCustomSearch: true });
+        }
+    }
+    
+    renderCoinList(filtered);
     DOM.btnClearSearch.classList.toggle('hidden', !q);
 }
 
@@ -1177,12 +1225,46 @@ function renderSwapGrid(filter = '') {
     DOM.swapGrid.innerHTML = '';
     const q = filter.trim().toUpperCase();
     const remaining = STATE.allCoins.filter(c => !STATE.selectedCoins.includes(c.symbol) && (!q || c.symbol.includes(q)));
+    
+    // Gelişmiş Coin Arama Motoru Enjeksiyonu
+    if(q && q.length >= 2 && q.length <= 10) {
+        const exactMatch = STATE.allCoins.find(c => c.symbol === q);
+        if(!exactMatch) {
+            remaining.unshift({ symbol: q, isCustomSearch: true });
+        }
+    }
+    
     remaining.slice(0, 100).forEach(coin => {
         const el = document.createElement('div');
         el.className = 'swap-coin';
+        
         if (coin.isPremium) {
             el.innerHTML = `<span class="sc-rank" style="color:var(--accent)">PRO</span><span class="sc-sym">${coin.symbol}</span><span style="margin-left:auto;font-size:0.8rem">🔒</span>`;
             el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else if (coin.isCustomSearch) {
+            el.innerHTML = `<span class="sc-sym" style="width:100%;text-align:center;color:var(--accent)">🔍 ${coin.symbol} API'de Ara</span>`;
+            el.style.border = "1px solid var(--accent-hover)";
+            el.style.background = "var(--accent-dim)";
+            el.addEventListener('click', async () => {
+                const prev = el.innerHTML;
+                el.innerHTML = `<span class="spinner" style="width:12px;height:12px;display:inline-block;vertical-align:middle;border-width:2px;border-top-color:var(--accent);margin-right:4px"></span>`;
+                try {
+                    const res = await fetch(`${CONFIG.baseUrl}/ticker/24hr?symbol=${coin.symbol}USDT`);
+                    if(!res.ok) throw new Error('-');
+                    const data = await res.json();
+                    
+                    const newCoin = { symbol: coin.symbol, quoteVolume: parseFloat(data.quoteVolume), rank: 'YENİ' };
+                    STATE.allCoins.unshift(newCoin);
+                    
+                    DOM.swapSearchInput.value = '';
+                    renderSwapGrid('');
+                    openSwapModal(coin.symbol);
+                } catch(e) {
+                    el.innerHTML = `<span style="color:var(--red)">❌ Hata</span>`;
+                    el.style.borderColor = "var(--red)";
+                    setTimeout(() => { if(el.parentElement) { el.innerHTML = prev; el.style.borderColor="var(--accent-hover)"; } }, 1500);
+                }
+            });
         } else {
             el.innerHTML = `<span class="sc-rank">#${coin.rank}</span><span class="sc-sym">${coin.symbol}</span>`;
             el.addEventListener('click', () => openSwapModal(coin.symbol));
@@ -1253,7 +1335,7 @@ function showResults() {
     DOM.resultsSection.classList.remove('hidden');
     DOM.displayMatrix.textContent=`${STATE.selectedCoins.length}×${STATE.selectedCoins.length}`;
     DOM.displayPeriod.textContent=CONFIG.periodMap[STATE.period].label;
-    DOM.navStatus.className='nav-status live';DOM.navStatus.innerHTML='<span class="status-dot"></span>Veriler Güncel';
+    DOM.navStatus.className='nav-status live';DOM.navStatus.innerHTML='<span class="status-dot"></span>' + t('stat_live');
     renderSwapGrid();
     
     // Matris ve Periyot düzenleme ikonlarını göster
@@ -1295,6 +1377,7 @@ async function initApp() {
         document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === STATE.period));
         document.querySelectorAll('.theme-dot').forEach(b => b.classList.toggle('active', b.dataset.theme === STATE.theme));
         DOM.displayPeriod.textContent = CONFIG.periodMap[STATE.period].label;
+        updateLiveUI();
 
         renderCoinList(STATE.allCoins); renderChips(); updateSelectionUI(); 
         
@@ -1357,8 +1440,67 @@ async function runAnalysis() {
     }
 }
 
+function updateLiveUI() {
+    if(!DOM.liveToggle) return;
+    if(STATE.isLive) {
+        DOM.liveText.innerHTML = t("live_on");
+        DOM.liveText.classList.add('active');
+        DOM.liveToggle.checked = true;
+        if(!STATE.liveIntervalRef) {
+            STATE.liveIntervalRef = setInterval(runLiveUpdate, 30000);
+        }
+    } else {
+        DOM.liveText.innerHTML = '<span style="opacity:0.6">' + t("live_off") + '</span>';
+        DOM.liveText.classList.remove('active');
+        DOM.liveToggle.checked = false;
+        if(STATE.liveIntervalRef) {
+            clearInterval(STATE.liveIntervalRef);
+            STATE.liveIntervalRef = null;
+        }
+    }
+}
+
+async function runLiveUpdate() {
+    if(DOM.resultsSection.classList.contains('hidden')) return;
+    if(STATE.isAnalyzing || apiCooldown) return; 
+    
+    // UI Feedback for background sync
+    DOM.navStatus.innerHTML = '<span class="status-dot"></span>' + t('alarm_scan');
+    
+    try {
+        const data = {}, coins = STATE.selectedCoins;
+        // Sessiz (loading göstermeden) fiyat çekimi
+        for (let i = 0; i < coins.length; i++) {
+            data[coins[i]] = await fetchCoinPrices(coins[i]);
+            await sleep(150); // Rate Limit koruması
+        }
+        STATE.lastPriceData = data;
+        
+        // Grafiği gizlice güncelle
+        const matrix = buildMatrix(data);
+        renderHeatmap(matrix); 
+        renderStats(matrix);
+        
+        // Alarmlar kuruluysa ekstra kontrolü yap (checkAlarms fonksiyonu interval'den bağımsız çalışsa da buradan tetiklenebilir)
+        if (typeof checkAlarms === 'function') checkAlarms();
+        
+    } catch(e) {
+        log(`Canlı Veri Hatası: ${e.message}`, 'error');
+    } finally { 
+        DOM.navStatus.innerHTML = '<span class="status-dot"></span>' + t('stat_live');
+    }
+}
+
 // ═══ Event Listeners ═══
 updateClock(); setInterval(updateClock,30000);
+
+if(DOM.liveToggle) {
+    DOM.liveToggle.addEventListener('change', (e) => {
+        STATE.isLive = e.target.checked;
+        saveStateToLocal();
+        updateLiveUI();
+    });
+}
 
 document.querySelectorAll('#matrix-toggles .toggle-btn').forEach(b => b.addEventListener('click', () => setMatrixSize(parseInt(b.dataset.size))));
 document.querySelectorAll('.period-btn').forEach(b => b.addEventListener('click', () => {
@@ -1531,6 +1673,14 @@ function renderIncreaseGrid(q) {
     q = q.trim().toUpperCase();
     let rem = STATE.allCoins.filter(c => !STATE.selectedCoins.includes(c.symbol) && (!q || c.symbol.includes(q)));
     let diff = MODAL_STATE.tempTargetSize - STATE.matrixSize;
+    
+    if(q && q.length >= 2 && q.length <= 10) {
+        const exactMatch = STATE.allCoins.find(c => c.symbol === q);
+        if(!exactMatch) {
+            rem.unshift({ symbol: q, isCustomSearch: true });
+        }
+    }
+    
     rem.slice(0, 100).forEach(coin => {
         let el = document.createElement('div');
         el.className = 'increase-item';
@@ -1538,6 +1688,33 @@ function renderIncreaseGrid(q) {
         if (coin.isPremium) {
             el.innerHTML = `<span class="inc-rank" style="color:var(--accent)">PRO</span> <span class="inc-sym">${coin.symbol}</span><span style="font-size:0.8rem">🔒</span>`;
             el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else if (coin.isCustomSearch) {
+            el.innerHTML = `<span class="inc-sym" style="width:100%;text-align:center;color:var(--accent)">🔍 ${coin.symbol} API'de Ara</span>`;
+            el.style.border = "1px solid var(--accent-hover)";
+            el.style.background = "var(--accent-dim)";
+            el.addEventListener('click', async () => {
+                const prev = el.innerHTML;
+                el.innerHTML = `<span class="spinner" style="width:12px;height:12px;display:inline-block;vertical-align:middle;border-width:2px;border-top-color:var(--accent);margin-right:4px"></span>`;
+                try {
+                    const res = await fetch(`${CONFIG.baseUrl}/ticker/24hr?symbol=${coin.symbol}USDT`);
+                    if(!res.ok) throw new Error('-');
+                    const data = await res.json();
+                    
+                    const newCoin = { symbol: coin.symbol, quoteVolume: parseFloat(data.quoteVolume), rank: 'YENİ' };
+                    STATE.allCoins.unshift(newCoin);
+                    
+                    if(MODAL_STATE.tempIncreaseSelection.length < diff) {
+                        MODAL_STATE.tempIncreaseSelection.push(coin.symbol);
+                    }
+                    DOM.btnConfirmIncrease.disabled = (MODAL_STATE.tempIncreaseSelection.length !== diff);
+                    
+                    DOM.increaseSearch.value = '';
+                    renderIncreaseGrid('');
+                } catch(e) {
+                    el.innerHTML = `<span style="color:var(--red)">❌ Hata</span>`;
+                    setTimeout(() => { if(el.parentElement) el.innerHTML = prev; }, 1500);
+                }
+            });
         } else {
             if(MODAL_STATE.tempIncreaseSelection.includes(coin.symbol)) el.classList.add('selected');
             el.innerHTML = `<span class="inc-rank">#${coin.rank}</span> <span class="inc-sym">${coin.symbol}</span>`;

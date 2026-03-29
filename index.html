@@ -28,6 +28,13 @@
                 <span class="nav-status" id="nav-status"><span class="status-dot"></span>Bağlantı Bekleniyor</span>
             </div>
             <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
+                <label class="live-toggle-container" title="Canlı Veri (30sn Otomatik Yenileme)">
+                    <span id="live-text" class="live-status-text">Live: <span style="opacity:0.6">KAPALI</span></span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="live-data-toggle">
+                        <span class="slider"></span>
+                    </div>
+                </label>
                 <button id="btn-alarm" class="btn-ghost" style="padding:5px 12px; font-size:0.75rem; border-color:var(--accent); color:var(--accent); display:flex; align-items:center; gap:6px; font-weight:700" title="Korelasyon Alarmları Kur" data-open="modal-alarm">
                     🔔 Canlı Alarm
                 </button>
