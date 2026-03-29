@@ -25,6 +25,9 @@
                 <span class="nav-status" id="nav-status"><span class="status-dot"></span>Bağlantı Bekleniyor</span>
             </div>
             <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
+                <button id="btn-risk" class="btn-ghost" style="padding:5px 12px; font-size:0.75rem; border-color:var(--red); color:var(--red); display:flex; align-items:center; gap:6px; font-weight:700" title="Portföyünü Test Et" data-open="modal-risk">
+                    🛡️ Risk Testi
+                </button>
                 <button id="btn-info" class="btn-ghost" style="padding:4px 10px; font-size:0.8rem; border-color:transparent; display:flex; align-items:center; gap:6px" title="Trader Eğitim Kılavuzu" data-open="modal-info">
                     <span style="border:1.5px solid currentColor; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold">i</span> Nasıl Okunur?
                 </button>
@@ -147,6 +150,29 @@
                 </div>
             </div>
 
+            <!-- Fırsat Avcısı (AI Scanner) -->
+            <div id="opportunity-scanner" class="premium-container swap-section" style="position:relative; overflow:hidden">
+                <div class="swap-header" style="display:flex; align-items:center; justify-content:space-between">
+                    <div>
+                        <h3 class="swap-title" style="display:flex; align-items:center; gap:6px"><span style="font-size:1.1rem">🤖</span> AI Fırsat Avcısı <span class="premium-badge">PRO</span></h3>
+                        <p class="swap-desc">Korelasyon anomalilerini ve "Ortalamaya Dönüş" (Mean Reversion) fırsatlarını anında yakalar.</p>
+                    </div>
+                </div>
+                
+                <div class="premium-blur-overlay" id="opp-lock-overlay">
+                    <span class="lock-icon" style="font-size:2rem; margin-bottom:10px; display:block">🔒</span>
+                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Fırsat Avcısı Kilitli</h4>
+                    <p style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">Algoritmik Al/Sat sinyallerini ve anomalileri görmek için Premium'a geçin.</p>
+                    <button class="btn-primary" data-open="modal-premium" style="font-size:0.8rem; padding:8px 20px">Aylık $29.99 - Kilidi Aç</button>
+                </div>
+
+                <div id="opp-content" class="opportunity-content blur-content">
+                    <div id="opp-list" style="display:flex; flex-direction:column; gap:8px;">
+                        <!-- JS burayı dinamik dolduracak -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Alt kısım: Coin değiştirme -->
             <div class="swap-section">
                 <div class="swap-header">
@@ -254,6 +280,61 @@
             </div>
         </div>
 
+        <!-- Cüzdan Risk Skoru Modalı -->
+        <div id="modal-risk" class="swap-modal hidden">
+            <div class="swap-modal-content" style="max-width:500px; width:100%; position:relative; overflow:hidden;">
+                <h3 class="swap-modal-title" style="margin-bottom:4px; text-align:left; display:flex; align-items:center; gap:8px">
+                    🛡️ Portföy Risk Skoru <span class="premium-badge">PRO</span>
+                </h3>
+                <p class="swap-desc" style="margin-bottom:20px; text-align:left;">Cüzdanınızdaki coinleri seçin. Tüm yatırımınızın aynı anda çökme riskini analiz edip koruma (Hedge) tavsiyesi sunalım.</p>
+                
+                <div class="premium-blur-overlay" style="border-radius:12px; z-index:10">
+                    <span class="lock-icon" style="font-size:2rem; margin-bottom:10px; display:block">🔒</span>
+                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Risk Analizi Kilitli</h4>
+                    <p style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">İflastan korunmak ve dinamik Hedge tavsiyesi almak için Premium'a geçin.</p>
+                    <button class="btn-primary" data-open="modal-premium" style="font-size:0.8rem; padding:8px 20px">Hemen Kilidi Aç</button>
+                </div>
+
+                <div class="blur-content">
+                    <div class="swap-search" style="max-width:100%; margin-bottom:12px">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="risk-search-input" placeholder="Cüzdanındaki coini ara (Örn: SOL)..." autocomplete="off">
+                    </div>
+                    <div class="chips-row" id="risk-portfolio-chips" style="background:var(--bg-input); padding:8px; border-radius:8px; border:1px solid var(--border); min-height:45px">
+                        <span class="chips-empty">Henüz cüzdana coin eklenmedi.</span>
+                    </div>
+                    
+                    <div style="background:var(--bg-card); border-radius:8px; padding:16px; margin-top:16px; border-left:4px solid var(--border-light)" id="risk-result-box">
+                        <h4 style="font-size:0.85rem; margin-bottom:8px; color:var(--text-2)">AI Analiz Sonucu</h4>
+                        <p style="font-size:0.75rem; color:var(--text-3)" id="risk-result-desc">Analiz için en az 2 coin ekleyin.</p>
+                    </div>
+                </div>
+                
+                <button class="swap-modal-close" data-close="modal-risk" style="width:100%; margin-top:20px;">Kapat</button>
+            </div>
+        </div>
+
+        <!-- Yönlendirme: Premium Ödeme Modalı (MOCK) -->
+        <div id="modal-premium" class="swap-modal hidden">
+            <div class="swap-modal-content" style="max-width:400px; width:100%; text-align:center;">
+                <div style="width:64px; height:64px; background:linear-gradient(135deg, var(--accent), #FF9800); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+                    <span style="font-size:1.8rem; color:#181A20">💎</span>
+                </div>
+                <h3 class="swap-modal-title" style="font-size:1.3rem; margin-bottom:8px">Premium'a Geçin</h3>
+                <p class="swap-desc" style="margin-bottom:20px;">Aylık <b>$29.99</b> ile platformun tüm profesyonel yeteneklerinin kilidini bugün açın.</p>
+                
+                <ul style="text-align:left; font-size:0.85rem; color:var(--text-2); margin-bottom:24px; padding-left:20px; line-height:1.7;">
+                    <li>🤖 <b>AI Fırsat Avcısı:</b> Piyasa anomalilerini tam zamanlı yakalayın.</li>
+                    <li>🛡️ <b>Cüzdan Risk Testi:</b> İflas riskini hesaplayın, Hedge önerisi alın.</li>
+                    <li>🌐 <b>Küresel Piyasalar:</b> DXY, S&P 500 ve XAU verisi ile büyük resmi görün.</li>
+                    <li>📊 <b>7/24 Destek:</b> Öncelikli müşteri hizmetleri.</li>
+                </ul>
+                
+                <button class="btn-primary" id="btn-mock-pay" style="width:100%; padding:14px; font-size:1rem; margin-bottom:12px; background:#635BFF; color:white; box-shadow:0 4px 14px rgba(99, 91, 255, 0.3)">💳 Stripe ile Güvenli Öde</button>
+                <button class="btn-ghost" data-close="modal-premium" style="width:100%">Şimdilik İptal</button>
+            </div>
+        </div>
+
     </main>
 
     <footer id="app-footer">
@@ -263,7 +344,7 @@
             <span>Binance Public API</span>
         </div>
         <div class="footer-contact">
-            Özel Projeler ve İletişim:
+            Şirketinize Özel VIP Dashboard veya Kaynak Kodu İçin Ulaşın:
             <a href="https://mail.google.com/mail/?view=cm&fs=1&to=togmusmuhammed@gmail.com" target="_blank" rel="noopener noreferrer" class="footer-link" title="Gmail üzerinden ulaşın">✉️ Mail</a>
             <span class="footer-separator">|</span>
             <a href="https://t.me/TGMS07" target="_blank" rel="noopener noreferrer" class="footer-link" title="Telegram üzerinden ulaşın">✈️ Telegram</a>

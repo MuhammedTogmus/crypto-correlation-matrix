@@ -189,8 +189,17 @@ async function fetchTop200() {
         .sort((a,b) => b.quoteVolume - a.quoteVolume)
         .slice(0, CONFIG.topCoinLimit);
     coins.forEach((c,i) => c.rank = i+1);
+    
+    // Premium Varlık Enjeksiyonu
+    const premiumAssets = [
+        { symbol: 'SPX', quoteVolume: 99999999999, isPremium: true, rank: 'PRO', name: 'S&P 500' },
+        { symbol: 'DXY', quoteVolume: 99999999998, isPremium: true, rank: 'PRO', name: 'Dolar Endeksi' },
+        { symbol: 'GOLD', quoteVolume: 99999999997, isPremium: true, rank: 'PRO', name: 'Ons Altın' }
+    ];
+    coins.unshift(...premiumAssets); // En üste ekle
+    
     DOM.initialLoaderProgress.style.width = '90%';
-    log(`${coins.length} coin alındı`);
+    log(`${coins.length} coin (Premium dahil) alındı`);
     return coins;
 }
 
@@ -202,9 +211,16 @@ function renderCoinList(coins) {
         el.className = 'coin-item';
         el.dataset.symbol = coin.symbol;
         if (STATE.selectedCoins.includes(coin.symbol)) el.classList.add('selected');
-        if (STATE.selectedCoins.length >= STATE.matrixSize && !STATE.selectedCoins.includes(coin.symbol)) el.classList.add('disabled');
-        el.innerHTML = `<span class="coin-rank">#${coin.rank}</span><span class="coin-symbol">${coin.symbol}</span><span class="coin-vol">$${fmtVol(coin.quoteVolume)}</span><span class="coin-check">✓</span>`;
-        el.addEventListener('click', () => toggleCoin(coin.symbol));
+        
+        // Premium Kontrolü
+        if (coin.isPremium) {
+            el.innerHTML = `<span class="coin-rank" style="color:var(--accent);font-weight:700">${coin.rank}</span><span class="coin-symbol">${coin.symbol} <span style="font-size:0.6rem;opacity:0.6">(${coin.name})</span></span><span class="coin-vol" style="margin-left:auto;color:var(--accent)">🔒 PRO</span>`;
+            el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else {
+            if (STATE.selectedCoins.length >= STATE.matrixSize && !STATE.selectedCoins.includes(coin.symbol)) el.classList.add('disabled');
+            el.innerHTML = `<span class="coin-rank">#${coin.rank}</span><span class="coin-symbol">${coin.symbol}</span><span class="coin-vol">$${fmtVol(coin.quoteVolume)}</span><span class="coin-check">✓</span>`;
+            el.addEventListener('click', () => toggleCoin(coin.symbol));
+        }
         DOM.coinListContainer.appendChild(el);
     });
 }
@@ -366,6 +382,35 @@ function renderStats(matrix) {
         el.innerHTML=`<span class="stat-pair">${pair}</span><span class="stat-value ${cls}">${value>0?'+':''}${value.toFixed(4)}</span>`;
         DOM.statsGrid.appendChild(el);
     });
+    renderOpportunities(matrix, coins, pairs);
+}
+
+// ═══ Fırsat Avcısı (AI Algo) ═══
+function renderOpportunities(matrix, coins, pairs) {
+    const oppList = document.getElementById('opp-list');
+    oppList.innerHTML = '';
+    
+    // Yüksek korelasyon veya aşırı negatif sapma yakala
+    let found = 0;
+    pairs.forEach(({pair, value}) => {
+        if (value > 0.85) {
+            found++;
+            oppList.innerHTML += `<div style="padding:10px 14px; background:rgba(14,203,129,0.08); border-left:3px solid var(--green); border-radius:6px; font-size:0.85rem">
+                <span style="font-weight:700; color:var(--text-1)">🟢 Al/Sat Sinyali (${pair}):</span> ${pair.split(' ↔ ')[0]} ve ${pair.split(' ↔ ')[1]} şu an mükemmel bir uyum (r=<b>+${value.toFixed(2)}</b>) içinde! Tarihsel sapma tespit edildiğinde anında <b>Pairs Trading</b> fırsatı verebilir. İzlemeye alın.
+            </div>`;
+        } else if (value < -0.70) {
+            found++;
+            oppList.innerHTML += `<div style="padding:10px 14px; background:rgba(246,70,93,0.08); border-left:3px solid var(--red); border-radius:6px; font-size:0.85rem">
+                <span style="font-weight:700; color:var(--text-1)">🔴 Hedge Fırsatı (${pair}):</span> <b>${value.toFixed(2)}</b> zıt korelasyon! Eğer portföyünüz tamamen ${pair.split(' ↔ ')[0]} içeriyorsa, ${pair.split(' ↔ ')[1]} alarak piyasa çöküşlerinden korunabilirsiniz.
+            </div>`;
+        }
+    });
+
+    if (found === 0) {
+        oppList.innerHTML = `<div style="padding:10px 14px; background:rgba(255,255,255,0.02); border-left:3px solid var(--border-light); border-radius:6px; font-size:0.85rem; color:var(--text-3)">
+            Seçili matriste şu an için agresif bir korelasyon kopması veya arbitraj fırsatı tespit edilmedi. Daha geniş bir periyot veya farklı coinler deneyebilirsiniz.
+        </div>`;
+    }
 }
 
 // ═══ Coin Swap (alt panel) ═══
@@ -376,8 +421,13 @@ function renderSwapGrid(filter = '') {
     remaining.slice(0, 100).forEach(coin => {
         const el = document.createElement('div');
         el.className = 'swap-coin';
-        el.innerHTML = `<span class="sc-rank">#${coin.rank}</span><span class="sc-sym">${coin.symbol}</span>`;
-        el.addEventListener('click', () => openSwapModal(coin.symbol));
+        if (coin.isPremium) {
+            el.innerHTML = `<span class="sc-rank" style="color:var(--accent)">PRO</span><span class="sc-sym">${coin.symbol}</span><span style="margin-left:auto;font-size:0.8rem">🔒</span>`;
+            el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else {
+            el.innerHTML = `<span class="sc-rank">#${coin.rank}</span><span class="sc-sym">${coin.symbol}</span>`;
+            el.addEventListener('click', () => openSwapModal(coin.symbol));
+        }
         DOM.swapGrid.appendChild(el);
     });
 }
@@ -590,6 +640,38 @@ document.querySelectorAll('[data-close]').forEach(btn => {
     });
 });
 
+// Portföy Risk Modalını Aç / Yönet
+let riskPortfolio = [];
+document.getElementById('btn-risk')?.addEventListener('click', () => {
+    document.getElementById('modal-risk').classList.remove('hidden');
+});
+
+const riskSearchInput = document.getElementById('risk-search-input');
+if(riskSearchInput) {
+    riskSearchInput.addEventListener('input', e => {
+        // Mock the search functionality behind the blur: it looks alive but is inaccessible
+        let val = e.target.value.toUpperCase();
+        if(val.length > 2 && !riskPortfolio.includes(val) && STATE.allCoins.some(c=>c.symbol===val)) {
+            riskPortfolio.push(val);
+            e.target.value = '';
+            document.getElementById('risk-portfolio-chips').innerHTML = riskPortfolio.map(c=>`<span class="chip">${c}</span>`).join('');
+            document.getElementById('risk-result-desc').innerHTML = `<b>${riskPortfolio.length}</b> coinin 30 günlük geçmişi taranıyor...`;
+            setTimeout(() => {
+                document.getElementById('risk-result-box').style.borderLeftColor = "var(--red)";
+                document.getElementById('risk-result-desc').innerHTML = `<span style="color:var(--red);font-weight:700">%94 Çöküş Riski!</span> Cüzdanınızdaki varlıklar neredeyse birebir aynı yönde hareket ediyor. Portföyünüzü dengelemek için hemen <strong style="color:var(--accent)">Gold (PAXG)</strong> veya <strong style="color:var(--accent)">USDC</strong> bazlı risksiz sepetler ekleyin.`;
+            }, 1200);
+        }
+    });
+}
+
+document.querySelectorAll('[data-open]').forEach(btn => {
+    btn.addEventListener('click', e => {
+        const modalId = e.currentTarget.dataset.open;
+        const modal = document.getElementById(modalId);
+        if(modal) modal.classList.remove('hidden');
+    });
+});
+
 // Periyot değiştirme
 document.querySelectorAll('.period-opt').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -690,20 +772,26 @@ function renderIncreaseGrid(q) {
     rem.slice(0, 100).forEach(coin => {
         let el = document.createElement('div');
         el.className = 'increase-item';
-        if(MODAL_STATE.tempIncreaseSelection.includes(coin.symbol)) el.classList.add('selected');
-        el.innerHTML = `<span class="inc-rank">#${coin.rank}</span> <span class="inc-sym">${coin.symbol}</span>`;
-        el.addEventListener('click', () => {
-            if(MODAL_STATE.tempIncreaseSelection.includes(coin.symbol)){
-                 MODAL_STATE.tempIncreaseSelection = MODAL_STATE.tempIncreaseSelection.filter(c => c !== coin.symbol);
-                 el.classList.remove('selected');
-            } else {
-                 if(MODAL_STATE.tempIncreaseSelection.length < diff) {
-                     MODAL_STATE.tempIncreaseSelection.push(coin.symbol);
-                     el.classList.add('selected');
-                 }
-            }
-            DOM.btnConfirmIncrease.disabled = (MODAL_STATE.tempIncreaseSelection.length !== diff);
-        });
+        
+        if (coin.isPremium) {
+            el.innerHTML = `<span class="inc-rank" style="color:var(--accent)">PRO</span> <span class="inc-sym">${coin.symbol}</span><span style="font-size:0.8rem">🔒</span>`;
+            el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else {
+            if(MODAL_STATE.tempIncreaseSelection.includes(coin.symbol)) el.classList.add('selected');
+            el.innerHTML = `<span class="inc-rank">#${coin.rank}</span> <span class="inc-sym">${coin.symbol}</span>`;
+            el.addEventListener('click', () => {
+                if(MODAL_STATE.tempIncreaseSelection.includes(coin.symbol)){
+                     MODAL_STATE.tempIncreaseSelection = MODAL_STATE.tempIncreaseSelection.filter(c => c !== coin.symbol);
+                     el.classList.remove('selected');
+                } else {
+                     if(MODAL_STATE.tempIncreaseSelection.length < diff) {
+                         MODAL_STATE.tempIncreaseSelection.push(coin.symbol);
+                         el.classList.add('selected');
+                     }
+                }
+                DOM.btnConfirmIncrease.disabled = (MODAL_STATE.tempIncreaseSelection.length !== diff);
+            });
+        }
         DOM.increaseGrid.appendChild(el);
     });
 }

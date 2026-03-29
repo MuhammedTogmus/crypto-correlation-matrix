@@ -215,3 +215,9 @@ body{font-family:var(--font);background:var(--bg-body);color:var(--text-1);min-h
 .footer-link { color:var(--text-2); text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:6px; transition:var(--ease); padding:2px 4px; }
 .footer-link:hover { color:var(--accent); text-shadow:0 0 10px rgba(252,213,53,0.3); transform:translateY(-1px); }
 .footer-separator { color:var(--border-light); user-select:none; }
+
+/* ═══ SaaS / FREEMIUM ÖZELLİKLER ═══ */
+.premium-badge { background: linear-gradient(135deg, var(--accent), #FF9800); color: #181a20; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; vertical-align: middle; box-shadow: 0 0 10px rgba(252,213,53,0.3); margin-left: 6px; }
+.premium-container { position: relative; overflow: hidden; border: 1px solid var(--accent-dim); }
+.blur-content { filter: blur(5px) grayscale(0.5); opacity: 0.4; pointer-events: none; user-select: none; transition: var(--ease); }
+.premium-blur-overlay { position: absolute; z-index: 5; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(11, 14, 17, 0.7); backdrop-filter: blur(3px); padding: 20px; transition: var(--ease); }
