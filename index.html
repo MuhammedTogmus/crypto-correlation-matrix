@@ -24,7 +24,10 @@
             <div class="nav-center">
                 <span class="nav-status" id="nav-status"><span class="status-dot"></span>Bağlantı Bekleniyor</span>
             </div>
-            <div class="nav-right">
+            <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
+                <button id="btn-info" class="btn-ghost" style="padding:4px 10px; font-size:0.8rem; border-color:transparent; display:flex; align-items:center; gap:6px" title="Trader Eğitim Kılavuzu" data-open="modal-info">
+                    <span style="border:1.5px solid currentColor; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold">i</span> Nasıl Okunur?
+                </button>
                 <span id="nav-time">--:--</span>
             </div>
         </div>
@@ -223,6 +226,31 @@
                     <button class="btn-primary" id="btn-confirm-increase" style="width:100%; padding:12px;" disabled>Onayla ve Analiz Et</button>
                 </div>
                 <button class="swap-modal-close" data-close="modal-matrix-increase" style="margin-top:8px;">İptal</button>
+            </div>
+        </div>
+
+        <!-- Nasıl Okunur? (Trader Info) Modalı -->
+        <div id="modal-info" class="swap-modal hidden">
+            <div class="swap-modal-content" style="max-width:480px; width:100%;">
+                <h3 class="swap-modal-title" style="margin-bottom:8px">Pearson Korelasyonu Nedir?</h3>
+                <p class="swap-desc" style="margin-bottom:20px; text-align:center;">Bu ısı haritası, kripto paraların fiyat hareketlerinin birbirlerine olan benzerliğini <b>-1.0</b> ile <b>+1.0</b> arasında ölçer.</p>
+                
+                <div style="display:flex; flex-direction:column; gap:12px">
+                    <div style="padding:12px; background:rgba(14,203,129,0.1); border-left:4px solid var(--green); border-radius:6px">
+                        <span style="color:var(--green); font-weight:700">+1.0 (Güçlü Pozitif)</span>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">İki coin aynı anda düşüp aynı anda yükseliyor demektir. Biri rallideyken diğeri de uçar.</p>
+                    </div>
+                    <div style="padding:12px; background:rgba(246,70,93,0.1); border-left:4px solid var(--red); border-radius:6px">
+                        <span style="color:var(--red); font-weight:700">-1.0 (Güçlü Negatif)</span>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Zıt yönlü hareket. Biri yükselirken diğeri düşer. Piyasayı karşılıklı hedge etmek için mükemmeldir!</p>
+                    </div>
+                    <div style="padding:12px; background:rgba(255,255,255,0.05); border-left:4px solid var(--text-3); border-radius:6px">
+                        <span style="color:var(--text-3); font-weight:700">0.0 (Nötr / Bağımsız)</span>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Aralarında mantıklı veya orantılı hiçbir bağ yoktur. Birinin hareketi diğerini etkilemez.</p>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" data-close="modal-info" style="width:100%; margin-top:20px; padding:12px">Anladım, Bol Kazançlar!</button>
             </div>
         </div>
 

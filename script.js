@@ -110,8 +110,35 @@ const MODAL_STATE = {
     tempIncreaseSelection: []
 };
 
-// ═══ LOCAL STORAGES ═══
+// ═══ LOCAL STORAGES & URL STATE ═══
 const LS_KEY = 'cryptoCorrState';
+
+function updateURLParameters() {
+    if(STATE.selectedCoins.length > 0) {
+        const params = new URLSearchParams();
+        params.set('coins', STATE.selectedCoins.join(','));
+        params.set('period', STATE.period);
+        params.set('theme', STATE.theme);
+        params.set('matrix', STATE.matrixSize);
+        window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+    }
+}
+
+function loadStateFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    let loaded = false;
+    if(params.has('coins')) {
+        const cArr = params.get('coins').split(',').map(s=>s.trim().toUpperCase()).filter(s=>s.length>0);
+        if(cArr.length > 0) { STATE.selectedCoins = cArr; loaded = true; }
+    }
+    if(params.has('period')) { STATE.period = params.get('period'); loaded = true; }
+    if(params.has('theme')) { STATE.theme = params.get('theme'); loaded = true; }
+    if(params.has('matrix')) { STATE.matrixSize = parseInt(params.get('matrix')); loaded = true; }
+    
+    if(loaded && !params.has('matrix')) STATE.matrixSize = Math.max(5, STATE.selectedCoins.length);
+    return loaded;
+}
+
 function saveStateToLocal() {
     localStorage.setItem(LS_KEY, JSON.stringify({
         selectedCoins: STATE.selectedCoins,
@@ -119,7 +146,9 @@ function saveStateToLocal() {
         period: STATE.period,
         theme: STATE.theme
     }));
+    updateURLParameters();
 }
+
 function loadStateFromLocal() {
     try {
         const saved = JSON.parse(localStorage.getItem(LS_KEY));
@@ -428,8 +457,24 @@ function showResults() {
 // ═══ Ana Akış ═══
 async function initApp() {
     try {
-        loadStateFromLocal();
+        const urlLoaded = loadStateFromURL();
+        if(!urlLoaded) {
+            loadStateFromLocal();
+        }
+
         STATE.allCoins = await fetchTop200();
+        
+        // Eğer URL'den coin geldiyse, geçerli olmayanları filtrele (ör: USDT dışı saçma coin yazılmışsa)
+        if(urlLoaded) {
+            STATE.selectedCoins = STATE.selectedCoins.filter(s => STATE.allCoins.some(c => c.symbol === s));
+            if(STATE.selectedCoins.length === 0) {
+                STATE.matrixSize = 5;
+                STATE.period = '30d';
+            } else if(STATE.selectedCoins.length !== STATE.matrixSize) {
+                STATE.matrixSize = STATE.selectedCoins.length;
+            }
+        }
+
         DOM.initialLoaderProgress.style.width='100%';DOM.initialLoaderText.textContent='Hazır';
         await sleep(300);
 
@@ -713,13 +758,44 @@ if(DOM.btnExportCSV) DOM.btnExportCSV.addEventListener('click', () => {
     log('CSV dosyası dışa aktarıldı.', 'log');
 });
 
-if(DOM.btnExportPNG) DOM.btnExportPNG.addEventListener('click', () => {
+if(DOM.btnExportPNG) DOM.btnExportPNG.addEventListener('click', async () => {
     if(!STATE.lastPriceData) return;
-    Plotly.downloadImage(DOM.heatmapChart, {
+    
+    // Yüksek Çözünürlüklü Filigran Ekle
+    const currentAnnots = DOM.heatmapChart.layout.annotations || [];
+    const watermark = {
+        text: 'Generated via CryptoCorr | Muhammed Toğmuş',
+        x: 1, y: 0,
+        xref: 'paper', yref: 'paper',
+        xanchor: 'right', yanchor: 'bottom',
+        showarrow: false,
+        font: { family: 'Space Grotesk', size: window.innerWidth < 768 ? 10 : 13, color: 'rgba(255, 255, 255, 0.5)' },
+        yshift: -40
+    };
+    
+    // Filigranı Gecici Olarak Plotly'e Ekle
+    await Plotly.relayout(DOM.heatmapChart, { annotations: [...currentAnnots, watermark] });
+    
+    // Resmi İndir
+    await Plotly.downloadImage(DOM.heatmapChart, {
         format: 'png',
         width: window.innerWidth < 768 ? 800 : 1200,
         height: window.innerWidth < 768 ? 800 : 1200,
         filename: `Korelasyon_Matrisi_${STATE.period}_${new Date().toISOString().split('T')[0]}`
     });
+    
+    // Filigranı Geri Çek (Kullanıcının Arayüzünü Bozmama)
+    setTimeout(() => {
+        Plotly.relayout(DOM.heatmapChart, { annotations: currentAnnots });
+    }, 200);
     log('PNG olarak indirildi.', 'log');
 });
+
+// Info Modal Dinleyicisi
+const btnInfo = document.getElementById('btn-info');
+if(btnInfo) {
+    btnInfo.addEventListener('click', () => {
+        const modal = document.getElementById('modal-info');
+        if(modal) modal.classList.remove('hidden');
+    });
+}
