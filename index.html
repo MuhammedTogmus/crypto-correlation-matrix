@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kripto para korelasyon ısı haritası - Top 200 coin, 10x10 matris, 5 renk teması">
+    <meta name="description" content="Kripto para korelasyon ısı haritası - Top 200 coin, 10x10 matris, 5 renk teması, AI Fırsat Avcısı PRO">
     <title>CryptoCorr | Korelasyon Analizi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <!-- NOTIFICATION TOAST CONTAINER -->
+    <div class="notif-toast-container" id="toast-container"></div>
 
     <!-- NAV -->
     <nav id="navbar">
@@ -25,6 +28,9 @@
                 <span class="nav-status" id="nav-status"><span class="status-dot"></span>Bağlantı Bekleniyor</span>
             </div>
             <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
+                <button id="btn-alarm" class="btn-ghost" style="padding:5px 12px; font-size:0.75rem; border-color:var(--accent); color:var(--accent); display:flex; align-items:center; gap:6px; font-weight:700" title="Korelasyon Alarmları Kur" data-open="modal-alarm">
+                    🔔 Canlı Alarm
+                </button>
                 <button id="btn-risk" class="btn-ghost" style="padding:5px 12px; font-size:0.75rem; border-color:var(--red); color:var(--red); display:flex; align-items:center; gap:6px; font-weight:700" title="Portföyünü Test Et" data-open="modal-risk">
                     🛡️ Risk Testi
                 </button>
@@ -32,6 +38,7 @@
                     <span style="border:1.5px solid currentColor; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold">i</span> Nasıl Okunur?
                 </button>
                 <span id="nav-time">--:--</span>
+                <button id="btn-lang" class="btn-ghost" style="padding:4px 10px; font-size:0.8rem; border-color:transparent; display:flex; align-items:center; gap:6px; font-weight:700" title="Change Language"><span style="font-size:1.1rem">🌍</span> <span id="lang-text">EN</span></button>
             </div>
         </div>
     </nav>
@@ -138,6 +145,11 @@
             <div class="result-body">
                 <div class="result-left">
                     <div class="chart-wrapper"><div id="heatmap-chart"></div></div>
+                    <!-- Volume Shock Banner -->
+                    <div id="volume-shock-banner" style="display:none; padding:8px 14px; background:rgba(255,235,59,0.06); border:1px solid rgba(255,235,59,0.2); border-radius:8px; margin-top:8px; font-size:0.75rem; color:var(--neon-yellow); display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:1.1rem">⚡</span>
+                        <span id="volume-shock-info">Hacim Şoku tespit edildi — Matris üzerinde neon sarı ile vurgulanıyor.</span>
+                    </div>
                     <div class="scale-bar">
                         <span class="scale-label">−1.0 Negatif</span>
                         <div class="scale-gradient" id="scale-gradient"></div>
@@ -150,24 +162,24 @@
                 </div>
             </div>
 
-            <!-- Fırsat Avcısı (AI Scanner) -->
+            <!-- Fırsat Avcısı (AI Scanner) with Backtest -->
             <div id="opportunity-scanner" class="premium-container swap-section" style="position:relative; overflow:hidden">
                 <div class="swap-header" style="display:flex; align-items:center; justify-content:space-between">
                     <div>
                         <h3 class="swap-title" style="display:flex; align-items:center; gap:6px"><span style="font-size:1.1rem">🤖</span> AI Fırsat Avcısı <span class="premium-badge">PRO</span></h3>
-                        <p class="swap-desc">Korelasyon anomalilerini ve "Ortalamaya Dönüş" (Mean Reversion) fırsatlarını anında yakalar.</p>
+                        <p class="swap-desc">Korelasyon anomalilerini ve "Ortalamaya Dönüş" (Mean Reversion) fırsatlarını anında yakalar. <b>Zaman Makinesi (Backtest)</b> ile tarihsel kanıt sunar.</p>
                     </div>
                 </div>
                 
                 <div class="premium-blur-overlay" id="opp-lock-overlay">
                     <span class="lock-icon" style="font-size:2rem; margin-bottom:10px; display:block">🔒</span>
-                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Fırsat Avcısı Kilitli</h4>
-                    <p style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">Algoritmik Al/Sat sinyallerini ve anomalileri görmek için Premium'a geçin.</p>
+                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Fırsat Avcısı & Zaman Makinesi Kilitli</h4>
+                    <p style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">Algoritmik Al/Sat sinyallerini, Backtest sonuçlarını ve anomalileri görmek için Premium'a geçin.</p>
                     <button class="btn-primary" data-open="modal-premium" style="font-size:0.8rem; padding:8px 20px">Aylık $29.99 - Kilidi Aç</button>
                 </div>
 
                 <div id="opp-content" class="opportunity-content blur-content">
-                    <div id="opp-list" style="display:flex; flex-direction:column; gap:8px;">
+                    <div id="opp-list" style="display:flex; flex-direction:column; gap:10px;">
                         <!-- JS burayı dinamik dolduracak -->
                     </div>
                 </div>
@@ -274,6 +286,14 @@
                         <span style="color:var(--text-3); font-weight:700">0.0 (Nötr / Bağımsız)</span>
                         <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Aralarında mantıklı veya orantılı hiçbir bağ yoktur. Birinin hareketi diğerini etkilemez.</p>
                     </div>
+                    <div style="padding:12px; background:rgba(255,235,59,0.08); border-left:4px solid var(--neon-yellow, #ffeb3b); border-radius:6px">
+                        <span style="color:#ffeb3b; font-weight:700; text-shadow:0 0 10px rgba(255,235,59,0.4)">⚡ Hacim Şoku (Neon Sarı Parlama)</span>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Matris üzerinde <b>Neon Sarı</b> parlayan coinler, son 24 saatte anormal işlem hacmi artışı (Kurumsal Para Girişi, Pump, veya Likidite Değişimi) tespit edilmiş coinlerdir. Bu coinlerin hacmi, gruptaki ortalamanın <b>2 katını</b> aşmıştır. Sadece fiyata değil hacme de bakarak tuzaklardan kaçının!</p>
+                    </div>
+                    <div style="padding:12px; background:rgba(14,203,129,0.05); border-left:4px solid rgba(14,203,129,0.5); border-radius:6px">
+                        <span style="color:var(--green); font-weight:700">🤖 Tarihsel Başarı (Backtest) Rozeti</span>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">AI Fırsat Avcısı bölümünde yeşil rozetler, sinyalin son 30 günlük geriye dönük testindeki performansı gösterir. Kaç kez kazandırdığı, ortalama getiri oranı ve başarı yüzdesi matematiksel olarak hesaplanır.</p>
+                    </div>
                 </div>
                 
                 <button class="btn-primary" data-close="modal-info" style="width:100%; margin-top:20px; padding:12px">Anladım, Bol Kazançlar!</button>
@@ -324,14 +344,64 @@
                 <p class="swap-desc" style="margin-bottom:20px;">Aylık <b>$29.99</b> ile platformun tüm profesyonel yeteneklerinin kilidini bugün açın.</p>
                 
                 <ul style="text-align:left; font-size:0.85rem; color:var(--text-2); margin-bottom:24px; padding-left:20px; line-height:1.7;">
-                    <li>🤖 <b>AI Fırsat Avcısı:</b> Piyasa anomalilerini tam zamanlı yakalayın.</li>
+                    <li>🤖 <b>Zaman Makinesi (Backtest):</b> AI sinyallerinin tarihsel kazanım oranlarını görün.</li>
+                    <li>🔔 <b>Canlı Alarm:</b> Fiyat uyumsuzluğu yakalandığında sesten ve lobi bildiriminden faydalanın.</li>
+                    <li>⚡ <b>Hacim Şoku:</b> Matrix üzerinde para giriş çıkışlarını glow efektiyle takip edin.</li>
                     <li>🛡️ <b>Cüzdan Risk Testi:</b> İflas riskini hesaplayın, Hedge önerisi alın.</li>
                     <li>🌐 <b>Küresel Piyasalar:</b> DXY, S&P 500 ve XAU verisi ile büyük resmi görün.</li>
-                    <li>📊 <b>7/24 Destek:</b> Öncelikli müşteri hizmetleri.</li>
                 </ul>
                 
                 <button class="btn-primary" id="btn-mock-pay" style="width:100%; padding:14px; font-size:1rem; margin-bottom:12px; background:#635BFF; color:white; box-shadow:0 4px 14px rgba(99, 91, 255, 0.3)">💳 Stripe ile Güvenli Öde</button>
                 <button class="btn-ghost" data-close="modal-premium" style="width:100%">Şimdilik İptal</button>
+            </div>
+        </div>
+
+        <!-- ═══ Canlı Alarmlar (Watchlist & Notifications) Modalı ═══ -->
+        <div id="modal-alarm" class="swap-modal hidden">
+            <div class="swap-modal-content" style="max-width:540px; width:100%; position:relative; overflow:hidden;">
+                <h3 class="swap-modal-title" style="margin-bottom:4px; text-align:left; display:flex; align-items:center; gap:8px; color:var(--accent)">
+                    🔔 Canlı Radar ve Alarm Sistemi <span class="premium-badge">PRO</span>
+                </h3>
+                <p class="swap-desc" style="margin-bottom:16px; text-align:left;">Sürekli ekrana bakmanıza gerek yok. Stratejinizi girin, hedef gerçekleştiğinde arka planda sesli ve görsel bildirim alın.</p>
+                
+                <div class="premium-blur-overlay" id="alarm-lock-overlay" style="border-radius:12px; z-index:10; background:rgba(11, 14, 17, 0.85)">
+                    <span class="lock-icon" style="font-size:2rem; margin-bottom:10px; display:block">🔒</span>
+                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Alarmlar Kilitli</h4>
+                    <p style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">Uyurken bile fırsatları yakalamak için HFT Push Alarmlarını açın.</p>
+                    <button class="btn-primary" data-open="modal-premium" style="font-size:0.8rem; padding:8px 20px">Hemen Kilidi Aç</button>
+                </div>
+
+                <div class="blur-content" id="alarm-panel-content">
+                    <!-- Alarm Kurma Formu -->
+                    <div class="alarm-config-row" style="display:flex; gap:8px; margin-bottom:12px;">
+                        <select id="alarm-pair-select" style="flex:1.3; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; font-family:var(--font); font-size:0.82rem">
+                            <option value="">Çift Seçin...</option>
+                        </select>
+                        <select id="alarm-condition-select" style="flex:1.2; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; font-family:var(--font); font-size:0.82rem">
+                            <option value="lt">Altına düşerse (<)</option>
+                            <option value="gt">Üstüne çıkarsa (>)</option>
+                        </select>
+                        <input type="number" id="alarm-threshold-input" value="0.50" step="0.05" min="-1" max="1" style="width:70px; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; text-align:center; font-family:var(--font); font-size:0.82rem">
+                    </div>
+                    <button class="btn-primary" id="btn-add-alarm" style="width:100%; font-size:0.82rem; padding:10px; background:var(--accent-hover); color:#000; margin-bottom:16px">
+                        🔔 Alarm Kur ve Arka Planda İzle
+                    </button>
+                    
+                    <!-- Aktif Alarmlar -->
+                    <div style="margin-top:4px">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+                            <h4 style="font-size:0.8rem; color:var(--text-4)">Aktif İzleme Listesi (Watchlist)</h4>
+                            <span class="live-indicator" id="alarm-live-indicator" style="display:none"><span class="live-dot"></span>Taranıyor</span>
+                        </div>
+                        <div id="alarm-watchlist" style="max-height:200px; overflow-y:auto;">
+                            <div style="padding:16px; text-align:center; color:var(--text-4); font-size:0.78rem;">
+                                Henüz alarm kurulmadı. Yukarıdan ilk alarmınızı ekleyin.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="swap-modal-close" data-close="modal-alarm" style="width:100%; margin-top:20px;">Kapat</button>
             </div>
         </div>
 

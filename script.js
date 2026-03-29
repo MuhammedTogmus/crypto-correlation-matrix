@@ -1,5 +1,459 @@
 /* CryptoCorr v4 - 10x10 Matris, 5 Renk Teması, Coin Swap */
 
+
+// ═══ MULTI-LANGUAGE (i18n) ═══
+const I18N = {
+    en: {
+        nav_wait: "Waiting for Connection",
+        nav_alarm: "🔔 Live Alarm",
+        nav_risk: "🛡️ Risk Test",
+        nav_read: "i",
+        nav_how: "How to Read?",
+        metric_src: "Source",
+        metric_mat: "Matrix",
+        metric_per: "Period",
+        metric_met: "Method",
+        ldr_main: "Loading Market Data",
+        ldr_sub: "Fetching top 200 coins from Binance...",
+        sel_title: "Coin Selection",
+        sel_desc: "Select coins for correlation analysis",
+        mat_lbl: "Matrix:",
+        per_lbl: "Period:",
+        search_ph: "Search coin...",
+        no_coin: "No coin selected yet",
+        btn_analyze: "Start Analysis",
+        btn_clear: "Clear",
+        res_title: "Correlation Matrix",
+        btn_csv: "📊 CSV",
+        btn_png: "🖼️ PNG",
+        btn_back: "◀ Back",
+        btn_refresh: "↻ Refresh",
+        side_corr: "Correlation Values",
+        ai_title: "🤖 AI Opportunity Hunter",
+        ai_desc: "Instantly catches correlation anomalies and Mean Reversion opportunities. Provides historical proof with <b>Time Machine (Backtest)</b>.",
+        ai_locked: "Hunter & Time Machine Locked",
+        ai_locked_sub: "Upgrade to Premium to see algorithmic Buy/Sell signals, Backtest results and anomalies.",
+        btn_unlock: "Unlock for $29.99/mo",
+        swap_main: "Swap Coin",
+        swap_desc: "Select a coin, then click the coin in the matrix you want to replace",
+        cancel: "Cancel",
+        mat_reduce: "Select Coin to Remove",
+        btn_apply: "Confirm & Apply",
+        mat_inc: "Select Coin to Add",
+        btn_analyzec: "Confirm & Analyze",
+        btn_understand: "Got it, Happy Trading!",
+        risk_title: "🛡️ Portfolio Risk Score",
+        risk_desc: "Select coins in your wallet. We'll analyze your complete crash risk and offer Hedge advice.",
+        risk_locked: "Risk Analysis Locked",
+        risk_locked_sub: "Upgrade to Premium to get dynamic Hedge advice and protect yourself from bankruptcy.",
+        btn_unlock_now: "Unlock Now",
+        risk_search: "Search coin in your wallet (e.g. SOL)...",
+        risk_no_coin: "No coins added to wallet yet.",
+        risk_res_title: "AI Analysis Result",
+        risk_res_desc: "Add at least 2 coins for analysis.",
+        btn_close: "Close",
+        prem_title: "Upgrade to Premium",
+        prem_desc: "Unlock all professional features of the platform today for <b>$29.99</b>/month.",
+        btn_pay: "💳 Pay Securely with Stripe",
+        btn_cancel_prem: "Cancel for now",
+        alarm_title: "🔔 Live Radar and Alarm System",
+        alarm_desc: "No need to stare at the screen. Enter your strategy and get audio/visual notifications in the background when your target is hit.",
+        alarm_locked: "Alarms Locked",
+        alarm_locked_sub: "Enable HFT Push Alarms to catch opportunities even while you sleep.",
+        alarm_sel: "Select Pair...",
+        alarm_lt: "Drops below (<)",
+        alarm_gt: "Rises above (>)",
+        btn_set_alarm: "🔔 Set Alarm & Monitor in Background",
+        alarm_watch: "Active Watchlist",
+        alarm_scan: "Scanning",
+        alarm_empty: "No alarms set yet. Add your first alarm above.",
+        shock_banner: "Volume Shock detected — Highlighted with neon yellow on the matrix.",
+        stat_loading: "Fetching Data...",
+        stat_ready: "Ready",
+        stat_analyzing: "Analyzing...",
+        stat_live: "Data Live",
+        toast_alarm: "Alarm Triggered",
+        backtest_badge: "✅ Historical Success (Backtest)",
+        backtest_badge_err: "📊 Backtest: Insufficient Signal",
+        hedge_badge: "🛡️ Historical Protection (Backtest)",
+        bt_engine: "🤖 Time Machine — Mean Reversion Z-Score Algo",
+        bt_engine_h: "🤖 Time Machine — Hedge Backtest Engine",
+        bt_period: "📅 Last {p}",
+        bt_s_tot: "Total Signals",
+        bt_s_win: "Winners",
+        bt_s_loss: "Losers",
+        bt_s_rate: "Win Rate",
+        bt_s_ret: "Avg. Return / Trade",
+        bt_s_cum: "Cumulative Return",
+        bt_s_dd: "Max Drawdown (DD)",
+        bt_s_tot_h: "Total Scenarios",
+        bt_s_win_h: "Successful Hedges",
+        bt_s_loss_h: "Failed Hedges",
+        bt_s_rate_h: "Protection Rate",
+        bt_s_ret_h: "Avg. Mitigation / Crash",
+        bt_s_cum_h: "Total Protection",
+        bt_ex_str: "🏆 Max Streak: <b>{v}</b> in a row",
+        bt_ex_shp: "📊 Sharpe: <b>{v}</b> ({l})",
+        bt_ex_bst: "⚡ Best: <b>+{v}%</b>",
+        bt_ex_wrst: "💀 Worst: <b>{v}%</b>",
+        opp_pair: "🟢 Pairs Trading Opportunity: {p}",
+        opp_hedge: "🔴 Short Selling / Hedge Opportunity: {p}",
+        opp_none_lbl: "Anamoly Scan Completed",
+        opp_none: "No aggressive correlation breakage or arbitrage opportunity detected in the selected matrix right now. Try a broader period or different coins.",
+        shp_exc: "Excellent", shp_good: "Good", shp_med: "Medium", shp_low: "Low",
+        info_pearson: "What is Pearson Correlation?",
+        info_pearson_desc: "This heatmap measures the similarity of crypto price movements between <b>-1.0</b> and <b>+1.0</b>.",
+        info_1: "Strong Positive",
+        info_1_desc: "Two coins fall and rise at the same time. If one rallies, the other flies too.",
+        info_2: "Strong Negative",
+        info_2_desc: "Opposite movement. When one rises, the other falls. Perfect for mutually hedging the market!",
+        info_3: "Neutral / Independent",
+        info_3_desc: "No logical or proportional connection between them. One's movement does not affect the other.",
+        info_4: "Volume Shock (Neon Yellow Glow)",
+        info_4_desc: "Coins glowing <b>Neon Yellow</b> on the matrix are those detected with abnormal trading volume increases. Avoid traps by looking at volume, not just price!",
+        info_5: "Historical Success (Backtest) Badge",
+        info_5_desc: "Green badges in the AI Opportunity Hunter section show the signal's backtested performance over the last 30 days.",
+        risk_1: "94% Crash Risk!",
+        risk_2: "Assets in your wallet move in identical directions. To balance your portfolio, immediately add risk-free baskets based on <strong style='color:var(--accent)'>Gold (PAXG)</strong> or <strong style='color:var(--accent)'>USDC</strong>.",
+        scan_txt: "<b>{l}</b> coins scanned for 30-day history...",
+        period_lbl: "30 Days", p7d: "7 Days", p1d: "1 Day", p6h: "6 Hours"
+    },
+    tr: {
+        nav_wait: "Bağlantı Bekleniyor",
+        nav_alarm: "🔔 Canlı Alarm",
+        nav_risk: "🛡️ Risk Testi",
+        nav_read: "i",
+        nav_how: "Nasıl Okunur?",
+        metric_src: "Kaynak",
+        metric_mat: "Matris",
+        metric_per: "Periyot",
+        metric_met: "Metod",
+        ldr_main: "Piyasa Verileri Yükleniyor",
+        ldr_sub: "Binance'den en hacimli 200 coin çekiliyor...",
+        sel_title: "Coin Seçimi",
+        sel_desc: "Korelasyon analizi için coinlerinizi seçin",
+        mat_lbl: "Matris:",
+        per_lbl: "Periyot:",
+        search_ph: "Coin ara...",
+        no_coin: "Henüz coin seçilmedi",
+        btn_analyze: "Analiz Başlat",
+        btn_clear: "Temizle",
+        res_title: "Korelasyon Matrisi",
+        btn_csv: "📊 CSV",
+        btn_png: "🖼️ PNG",
+        btn_back: "◀ Geri",
+        btn_refresh: "↻ Yenile",
+        side_corr: "Korelasyon Değerleri",
+        ai_title: "🤖 AI Fırsat Avcısı",
+        ai_desc: "Korelasyon anomalilerini ve "${t("shp_med")}lamaya Dönüş" (Mean Reversion) fırsatlarını anında yakalar. <b>Zaman Makinesi (Backtest)</b> ile tarihsel kanıt sunar.",
+        ai_locked: "Fırsat Avcısı & Zaman Makinesi Kilitli",
+        ai_locked_sub: "Algoritmik Al/Sat sinyallerini, Backtest sonuçlarını ve anomalileri görmek için Premium'a geçin.",
+        btn_unlock: "Aylık $29.99 - Kilidi Aç",
+        swap_main: "Coin Değiştir",
+        swap_desc: "Bir coin seçin, ardından matristeki değiştirmek istediğiniz coine tıklayın",
+        cancel: "İptal",
+        mat_reduce: "Çıkarılacak Olan Coini Seçin",
+        btn_apply: "Onayla ve Uygula",
+        mat_inc: "Eklenecek Coini Seçin",
+        btn_analyzec: "Onayla ve Analiz Et",
+        btn_understand: "Anladım, Bol Kazançlar!",
+        risk_title: "🛡️ Portföy Risk Skoru",
+        risk_desc: "Cüzdanınızdaki coinleri seçin. Tüm yatırımınızın aynı anda çökme riskini analiz edip koruma (Hedge) tavsiyesi sunalım.",
+        risk_locked: "Risk Analizi Kilitli",
+        risk_locked_sub: "İflastan korunmak ve dinamik Hedge tavsiyesi almak için Premium'a geçin.",
+        btn_unlock_now: "Hemen Kilidi Aç",
+        risk_search: "Cüzdanındaki coini ara (Örn: SOL)...",
+        risk_no_coin: "Henüz cüzdana coin eklenmedi.",
+        risk_res_title: "AI Analiz Sonucu",
+        risk_res_desc: "Analiz için en az 2 coin ekleyin.",
+        btn_close: "Kapat",
+        prem_title: "Premium'a Geçin",
+        prem_desc: "Aylık <b>$29.99</b> ile platformun tüm profesyonel yeteneklerinin kilidini bugün açın.",
+        btn_pay: "💳 Stripe ile Güvenli Öde",
+        btn_cancel_prem: "Şimdilik İptal",
+        alarm_title: "🔔 Canlı Radar ve Alarm Sistemi",
+        alarm_desc: "Sürekli ekrana bakmanıza gerek yok. Stratejinizi girin, hedef gerçekleştiğinde arka planda sesli ve görsel bildirim alın.",
+        alarm_locked: "Alarmlar Kilitli",
+        alarm_locked_sub: "Uyurken bile fırsatları yakalamak için HFT Push Alarmlarını açın.",
+        alarm_sel: "Çift Seçin...",
+        alarm_lt: "Altına düşerse (<)",
+        alarm_gt: "Üstüne çıkarsa (>)",
+        btn_set_alarm: "🔔 Alarm Kur ve Arka Planda İzle",
+        alarm_watch: "Aktif İzleme Listesi (Watchlist)",
+        alarm_scan: "Taranıyor",
+        alarm_empty: "t('alarm_empty'). Yukarıdan ilk alarmınızı ekleyin.",
+        shock_banner: "Hacim Şoku tespit edildi — Matris üzerinde neon sarı ile vurgulanıyor.",
+        stat_loading: "Veriler Alınıyor...",
+        stat_ready: "Hazır",
+        stat_analyzing: "Analiz Ediliyor...",
+        stat_live: "Veriler Güncel",
+        toast_alarm: "Alarm Tetiklendi",
+        backtest_badge: "✅ Tarihsel Başarı (Backtest)",
+        backtest_badge_err: "📊 Backtest: Sinyal Yetersiz",
+        hedge_badge: "🛡️ Tarihsel Koruma (Backtest)",
+        bt_engine: "${t("bt_engine")}",
+        bt_engine_h: "${t("bt_engine_h")}",
+        bt_period: "📅 Son {p}",
+        bt_s_tot: "${t("bt_s_tot")}",
+        bt_s_win: "${t("bt_s_win")}",
+        bt_s_loss: "${t("bt_s_loss")}",
+        bt_s_rate: "${t("bt_s_rate")}",
+        bt_s_ret: "${t("bt_s_ret")}",
+        bt_s_cum: "${t("bt_s_cum")}",
+        bt_s_dd: "${t("bt_s_dd")}",
+        bt_s_tot_h: "${t("bt_s_tot_h")}",
+        bt_s_win_h: "${t("bt_s_win_h")}",
+        bt_s_loss_h: "${t("bt_s_loss_h")}",
+        bt_s_rate_h: "${t("bt_s_rate_h")}",
+        bt_s_ret_h: "${t("bt_s_ret_h")}",
+        bt_s_cum_h: "${t("bt_s_cum_h")}",
+        bt_ex_str: "🏆 Max Seri: <b>{v}</b> ardışık",
+        bt_ex_shp: "📊 Sharpe: <b>{v}</b> ({l})",
+        bt_ex_bst: "⚡ En ${t("shp_good")}: <b>+{v}%</b>",
+        bt_ex_wrst: "💀 En Kötü: <b>{v}%</b>",
+        opp_pair: "🟢 Çift İşlemi (Pairs Trading) Fırsatı: {p}",
+        opp_hedge: "🔴 Açığa Satış / Hedge Fırsatı: {p}",
+        opp_none_lbl: "${t("opp_none_lbl")}",
+        opp_none: "${t("opp_none")}",
+        shp_exc: "${t("shp_exc")}", shp_good: "${t("shp_good")}", shp_med: "${t("shp_med")}", shp_low: "${t("shp_low")}",
+        info_pearson: "Pearson Korelasyonu Nedir?",
+        info_pearson_desc: "Bu ısı haritası, kripto paraların fiyat hareketlerinin birbirlerine olan benzerliğini <b>-1.0</b> ile <b>+1.0</b> arasında ölçer.",
+        info_1: "+1.0 (Güçlü Pozitif)",
+        info_1_desc: "İki coin aynı anda düşüp aynı anda yükseliyor demektir. Biri rallideyken diğeri de uçar.",
+        info_2: "-1.0 (Güçlü Negatif)",
+        info_2_desc: "Zıt yönlü hareket. Biri yükselirken diğeri düşer. Piyasayı karşılıklı hedge etmek için mükemmeldir!",
+        info_3: "0.0 (Nötr / Bağımsız)",
+        info_3_desc: "Aralarında mantıklı veya orantılı hiçbir bağ yoktur. Birinin hareketi diğerini etkilemez.",
+        info_4: "⚡ Hacim Şoku (Neon Sarı Parlama)",
+        info_4_desc: "Matris üzerinde <b>Neon Sarı</b> parlayan coinler, son 24 saatte anormal işlem hacmi artışı (Kurumsal Para Girişi, Pump, veya Likidite Değişimi) tespit edilmiş coinlerdir. Bu coinlerin hacmi, gruptaki ortalamanın <b>2 katını</b> aşmıştır. Sadece fiyata değil hacme de bakarak tuzaklardan kaçının!",
+        info_5: "🤖 Tarihsel Başarı (Backtest) Rozeti",
+        info_5_desc: "AI Fırsat Avcısı bölümünde yeşil rozetler, sinyalin son 30 günlük geriye dönük testindeki performansı gösterir. Kaç kez kazandırdığı, ortalama getiri oranı ve başarı yüzdesi matematiksel olarak hesaplanır.",
+        risk_1: "%94 Çöküş Riski!",
+        risk_2: "Cüzdanınızdaki varlıklar neredeyse birebir aynı yönde hareket ediyor. Portföyünüzü dengelemek için hemen <strong style='color:var(--accent)'>Gold (PAXG)</strong> veya <strong style='color:var(--accent)'>USDC</strong> bazlı risksiz sepetler ekleyin.",
+        scan_txt: "<b>{l}</b> coinin 30 günlük geçmişi taranıyor...",
+        period_lbl: "30 Gün", p7d: "7 Gün", p1d: "1 Gün", p6h: "6 Saat"
+    }
+};
+
+let userLang = localStorage.getItem("cryptoLang") || "en";
+
+function updateUrlLangParam() {
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('lang') !== userLang) {
+        params.set('lang', userLang);
+        window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+    }
+}
+
+function t(key, vars = {}) {
+    let text = I18N[userLang][key] || key;
+    for(let k in vars) text = text.replace("{"+k+"}", vars[k]);
+    return text;
+}
+
+function updateStaticUI() {
+    const byId = (id, k, html=false) => { 
+        const e=document.getElementById(id); 
+        if(!e) return;
+        if(html) e.innerHTML = t(k); else e.textContent = t(k); 
+    };
+    
+    byId('initial-loader-text', 'ldr_main');
+    byId('initial-loader-subtext', 'ldr_sub');
+    byId('coin-search-input', 'search_ph');
+    $('#coin-search-input')?.setAttribute('placeholder', t('search_ph'));
+    byId('btn-analyze', 'btn_analyze');
+    byId('btn-clear-selection', 'btn_clear');
+    byId('btn-back', 'btn_back');
+    byId('btn-refresh', 'btn_refresh');
+    byId('volume-shock-info', 'shock_banner');
+    byId('risk-search-input', 'risk_search');
+    $('#risk-search-input')?.setAttribute('placeholder', t('risk_search'));
+    byId('risk-result-desc', 'risk_res_desc');
+    byId('swap-search-input', 'search_ph');
+    $('#swap-search-input')?.setAttribute('placeholder', t('search_ph'));
+    byId('increase-search-input', 'search_ph');
+    $('#increase-search-input')?.setAttribute('placeholder', t('search_ph'));
+    
+    // Selectors
+    document.querySelectorAll('.metric-label')[0].textContent = t('metric_src');
+    document.querySelectorAll('.metric-label')[1].innerHTML = `${t('metric_mat')} <span class="metric-icon edit-icon" style="opacity:0.7;display:none">✎</span>`;
+    document.querySelectorAll('.metric-label')[2].innerHTML = `${t('metric_per')} <span class="metric-icon edit-icon" style="opacity:0.7;display:none">✎</span>`;
+    document.querySelectorAll('.metric-label')[3].textContent = t('metric_met');
+    
+    document.querySelector('.selector-title').textContent = t('sel_title');
+    document.querySelector('.selector-desc').textContent = t('sel_desc');
+    document.querySelectorAll('.toggle-label')[0].textContent = t('mat_lbl');
+    document.querySelectorAll('.toggle-label')[1].textContent = t('per_lbl');
+    document.querySelector('.chips-empty').textContent = t('no_coin');
+    
+    document.querySelector('.result-title').textContent = t('res_title');
+    document.getElementById('btn-export-csv').innerHTML = `📊 <span style="color:var(--accent)">${t('btn_csv').replace('📊 ','')}</span>`;
+    document.getElementById('btn-export-png').innerHTML = `🖼️ <span style="color:var(--accent)">${t('btn_png').replace('🖼️ ','')}</span>`;
+    
+    document.querySelector('.side-title').textContent = t('side_corr');
+    document.querySelector('.swap-title').innerHTML = `<span style="font-size:1.1rem">🤖</span> ${t('ai_title')} <span class="premium-badge">PRO</span>`;
+    document.querySelector('.swap-desc').innerHTML = t('ai_desc');
+    
+    const secSwapTitle = document.querySelectorAll('.swap-section .swap-title');
+    if(secSwapTitle.length > 1) secSwapTitle[1].textContent = t('swap_main');
+    const secSwapDesc = document.querySelectorAll('.swap-section .swap-desc');
+    if(secSwapDesc.length > 1) secSwapDesc[1].textContent = t('swap_desc');
+    
+    // Opp overlay
+    document.querySelector('#opp-lock-overlay h4').textContent = t('ai_locked');
+    document.querySelector('#opp-lock-overlay p').textContent = t('ai_locked_sub');
+    document.querySelector('#opp-lock-overlay button').textContent = t('btn_unlock');
+    
+    // Modals
+    const mt = document.querySelectorAll('.swap-modal-title');
+    mt.forEach(m => {
+        if(m.textContent.includes('Hangi coin') || m.textContent.includes('Which coin')) m.textContent = "Hangi coin ile değiştirilsin? / Which coin to swap with?";
+        if(m.textContent.includes('Periyot')) m.textContent = t('per_lbl').replace(':','') + " Edit";
+        if(m.textContent.includes('Matris Boyutu')) m.textContent = t('mat_size_title') || "New Matrix Size";
+        if(m.id === 'reduce-title') m.innerHTML = t('mat_reduce');
+        if(m.id === 'increase-title') m.innerHTML = t('mat_inc');
+    });
+    
+    document.querySelectorAll('[data-close]').forEach(b => {
+        if(b.textContent.includes('İptal') || b.textContent.includes('Cancel')) b.textContent = t('cancel');
+        if(b.textContent.includes('Kapat') || b.textContent.includes('Close')) b.textContent = t('btn_close');
+    });
+    
+    byId('btn-confirm-reduce', 'btn_apply');
+    byId('btn-confirm-increase', 'btn_analyzec');
+    
+    // Info Modal
+    const infoT = document.querySelector('#modal-info .swap-modal-title');
+    if(infoT) infoT.textContent = t('info_pearson');
+    const infoD = document.querySelector('#modal-info .swap-desc');
+    if(infoD) infoD.innerHTML = t('info_pearson_desc');
+    const infoDivs = document.querySelectorAll('#modal-info .swap-modal-content > div > div');
+    if(infoDivs.length >= 5) {
+        infoDivs[0].querySelector('span').textContent = t('info_1');
+        infoDivs[0].querySelector('p').textContent = t('info_1_desc');
+        infoDivs[1].querySelector('span').textContent = t('info_2');
+        infoDivs[1].querySelector('p').textContent = t('info_2_desc');
+        infoDivs[2].querySelector('span').textContent = t('info_3');
+        infoDivs[2].querySelector('p').textContent = t('info_3_desc');
+        infoDivs[3].querySelector('span').innerHTML = t('info_4');
+        infoDivs[3].querySelector('p').innerHTML = t('info_4_desc');
+        infoDivs[4].querySelector('span').textContent = t('info_5');
+        infoDivs[4].querySelector('p').textContent = t('info_5_desc');
+    }
+    const btnUnd = document.querySelector('#modal-info .btn-primary');
+    if(btnUnd) btnUnd.textContent = t('btn_understand');
+    
+    // Risk Modal
+    const riskT = document.querySelector('#modal-risk .swap-modal-title');
+    if(riskT) riskT.innerHTML = `${t('risk_title')} <span class="premium-badge">PRO</span>`;
+    const riskD = document.querySelector('#modal-risk .swap-desc');
+    if(riskD) riskD.textContent = t('risk_desc');
+    document.querySelector('#modal-risk .premium-blur-overlay h4').textContent = t('risk_locked');
+    document.querySelector('#modal-risk .premium-blur-overlay p').textContent = t('risk_locked_sub');
+    document.querySelector('#modal-risk .premium-blur-overlay button').textContent = t('btn_unlock_now');
+    document.querySelector('#risk-portfolio-chips').innerHTML = `<span class="chips-empty">${t('risk_no_coin')}</span>`;
+    byId('risk-result-desc', 'risk_res_desc');
+    document.querySelector('#risk-result-box h4').textContent = t('risk_res_title');
+    
+    // Premium Modal
+    const premT = document.querySelector('#modal-premium .swap-modal-title');
+    if(premT) premT.textContent = t('prem_title');
+    const premD = document.querySelector('#modal-premium .swap-desc');
+    if(premD) premD.innerHTML = t('prem_desc');
+    byId('btn-mock-pay', 'btn_pay', true);
+    const mockP = document.getElementById('btn-mock-pay');
+    if(mockP) mockP.innerHTML = `💳 ${t('btn_pay')}`;
+    const premC = document.querySelector('#modal-premium .btn-ghost');
+    if(premC) premC.textContent = t('btn_cancel_prem');
+    
+    // Alarm Modal
+    const alrmT = document.querySelector('#modal-alarm .swap-modal-title');
+    if(alrmT) alrmT.innerHTML = `${t('alarm_title')} <span class="premium-badge">PRO</span>`;
+    const alrmD = document.querySelector('#modal-alarm .swap-desc');
+    if(alrmD) alrmD.textContent = t('alarm_desc');
+    const alrmLoc = document.querySelector('#alarm-lock-overlay h4');
+    if(alrmLoc) alrmLoc.textContent = t('alarm_locked');
+    const alrmLocP = document.querySelector('#alarm-lock-overlay p');
+    if(alrmLocP) alrmLocP.textContent = t('alarm_locked_sub');
+    const alrmLocB = document.querySelector('#alarm-lock-overlay button');
+    if(alrmLocB) alrmLocB.textContent = t('btn_unlock_now');
+    document.getElementById('alarm-pair-select').options[0].textContent = t('alarm_sel');
+    document.getElementById('alarm-condition-select').options[0].textContent = t('alarm_lt');
+    document.getElementById('alarm-condition-select').options[1].textContent = t('alarm_gt');
+    byId('btn-add-alarm', 'btn_set_alarm');
+    const wlH4 = document.querySelector('#modal-alarm h4:not(#alarm-lock-overlay h4)');
+    if(wlH4) wlH4.textContent = t('alarm_watch');
+    document.getElementById('alarm-live-indicator').innerHTML = `<span class="live-dot"></span>${t('alarm_scan')}`;
+    document.querySelector('#alarm-watchlist div').textContent = t('alarm_empty');
+    
+    // Navbar Fix
+    byId('btn-alarm', 'nav_alarm', true);
+    byId('btn-risk', 'nav_risk', true);
+    byId('btn-info', 'nav_how', true);
+    const bInfo = document.getElementById('btn-info');
+    if (bInfo) bInfo.innerHTML = `<span style="border:1.5px solid currentColor; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold">i</span> ${t('nav_how')}`;
+    
+    const lnText = document.getElementById('lang-text');
+    if(lnText) lnText.textContent = userLang === "en" ? "EN" : "TR";
+    
+    document.title = "CryptoCorr | Correlation Matrix";
+}
+
+function updateLang() {
+    userLang = userLang === "en" ? "tr" : "en";
+    localStorage.setItem("cryptoLang", userLang);
+    updateUrlLangParam();
+    updateStaticUI();
+    
+    // Redraw and re-translate dynamic elements
+    if (STATE.selectedCoins.length > 0) {
+        updateSelectionUI();
+        if(STATE.lastPriceData && !DOM.resultsSection.classList.contains('hidden')) {
+            const matrix = buildMatrix(STATE.lastPriceData);
+            renderStats(matrix);
+            CONFIG.periodMap = {
+                '6h':  { interval: '5m',  limit: 72,  label: t('p6h') },
+                '1d':  { interval: '15m', limit: 96,  label: t('p1d') },
+                '7d':  { interval: '1h',  limit: 168, label: t('p7d') },
+                '30d': { interval: '1d',  limit: 30,  label: t('period_lbl') }
+            };
+            DOM.displayPeriod.textContent = CONFIG.periodMap[STATE.period].label;
+            DOM.resultCoinsLabel.textContent = STATE.selectedCoins.join(' • ') + ` — ${t('bt_period',{p:CONFIG.periodMap[STATE.period].label}).replace('📅 ','')}`;
+        }
+    }
+}
+
+// Ensure the helper is available globally
+function $(sel) { return document.querySelector(sel); }
+
+document.addEventListener("DOMContentLoaded", () => {
+    // If URL has lang, use it
+    const params = new URLSearchParams(window.location.search);
+    if(params.has('lang') && ['en','tr'].includes(params.get('lang'))) {
+        userLang = params.get('lang');
+        localStorage.setItem("cryptoLang", userLang);
+    }
+    
+    document.body.addEventListener("click", e => {
+        if(e.target.closest("#btn-lang")) {
+            updateLang();
+        }
+    });
+
+    // Update periods
+    CONFIG.periodMap = {
+        '6h':  { interval: '5m',  limit: 72,  label: t('p6h') },
+        '1d':  { interval: '15m', limit: 96,  label: t('p1d') },
+        '7d':  { interval: '1h',  limit: 168, label: t('p7d') },
+        '30d': { interval: '1d',  limit: 30,  label: t('period_lbl') }
+    };
+    
+    // Run translation once
+    setTimeout(updateStaticUI, 100);
+});
+
+
 const CONFIG = {
     baseUrl: 'https://api.binance.com/api/v3',
     topCoinLimit: 200,
@@ -169,9 +623,9 @@ function fmtVol(v) { return v >= 1e9 ? (v/1e9).toFixed(1)+'B' : v >= 1e6 ? (v/1e
 
 // ═══ Binance API: Top 200 ═══
 async function fetchTop200() {
-    log('Top 200 coin çekiliyor...');
+    log(t('ldr_sub'));
     DOM.initialLoaderProgress.style.width = '20%';
-    DOM.initialLoaderSubtext.textContent = 'Piyasa verileri alınıyor...';
+    DOM.initialLoaderSubtext.textContent = t('ldr_main');
     const res = await fetch(`${CONFIG.baseUrl}/ticker/24hr`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const tickers = await res.json();
@@ -234,7 +688,7 @@ function toggleCoin(symbol) {
 
 function updateSelectionUI() {
     const c = STATE.selectedCoins.length, m = STATE.matrixSize;
-    DOM.selectionCounter.textContent = `${c} / ${m} seçildi`;
+    DOM.selectionCounter.textContent = `${c} / ${m} ` + t('btn_analyze').split(' ')[0];
     DOM.selectionCounter.className = 'counter' + (c === m ? ' complete' : '');
     DOM.displayMatrix.textContent = `${m}×${m}`;
     DOM.btnAnalyze.disabled = c !== m;
@@ -340,6 +794,24 @@ function renderHeatmap(matrix) {
         });
     }
 
+    // -- Hacim Şoku (Volume Shock) Tespiti --
+    let currentCoinsData = STATE.allCoins.filter(c => coins.includes(c.symbol));
+    let volumeShockCoins = [];
+    if(currentCoinsData.length > 0) {
+        let avgVolume = currentCoinsData.reduce((sum, c) => sum + c.quoteVolume, 0) / currentCoinsData.length;
+        // Eğer coin'in hacmi ortalamanın 2 katından fazlaysa şok say
+        volumeShockCoins = currentCoinsData.filter(c => c.quoteVolume > avgVolume * 2).map(c => c.symbol);
+        
+        const banner = document.getElementById('volume-shock-banner');
+        if (banner) {
+            banner.style.display = volumeShockCoins.length > 0 ? 'flex' : 'none';
+        }
+    }
+    
+    // Y ekseni textleri
+    let yTickText = coins.map(c => volumeShockCoins.includes(c) ? `<b class="volume-shock-text">${c}</b>` : c);
+    let xTickText = coins.map(c => volumeShockCoins.includes(c) ? `<b class="volume-shock-text">${c}</b>` : c);
+
     Plotly.newPlot(DOM.heatmapChart, [{
         z:matrix,x:coins,y:coins,type:'heatmap',colorscale:theme.scale,
         zmin:-1,zmax:1,showscale:true,hoverongaps:false,
@@ -351,8 +823,8 @@ function renderHeatmap(matrix) {
     }], {
         annotations:annots,
         dragmode: false, // Mobilde sayfanın scroll olmasını engellemez! Seçim (box/pan) devre dışı.
-        xaxis:{side:'bottom',tickfont:{family:'Space Grotesk',size:n<=6?12:(n<=8?10:8),color:'#eaecef',weight:700},tickangle:isMobile?-45:0,gridcolor:'rgba(43,49,57,0.5)',linecolor:'#2b3139'},
-        yaxis:{autorange:'reversed',tickfont:{family:'Space Grotesk',size:n<=6?12:(n<=8?10:8),color:'#eaecef',weight:700},gridcolor:'rgba(43,49,57,0.5)',linecolor:'#2b3139'},
+        xaxis:{side:'bottom',tickfont:{family:'Space Grotesk',size:n<=6?12:(n<=8?10:8),color:'#eaecef',weight:700},tickangle:isMobile?-45:0,gridcolor:'rgba(43,49,57,0.5)',linecolor:'#2b3139', ticktext:xTickText, tickvals:coins},
+        yaxis:{autorange:'reversed',tickfont:{family:'Space Grotesk',size:n<=6?12:(n<=8?10:8),color:'#eaecef',weight:700},gridcolor:'rgba(43,49,57,0.5)',linecolor:'#2b3139', ticktext:yTickText, tickvals:coins},
         paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
         margin:{l:isMobile?(n>6?40:50):50, r:isMobile?40:60, t:16, b:isMobile?50:40},
         height: chartHeight,
@@ -376,8 +848,20 @@ function renderStats(matrix) {
     for(let i=0;i<coins.length;i++) for(let j=i+1;j<coins.length;j++) pairs.push({pair:`${coins[i]} ↔ ${coins[j]}`,value:matrix[i][j]});
     pairs.sort((a,b) => Math.abs(b.value)-Math.abs(a.value));
     DOM.statsGrid.innerHTML = '';
+    // Eğer Hacim Şoku tespit edildiyse stat containerları da parlasın
+    let currentCoinsData = STATE.allCoins.filter(c => coins.includes(c.symbol));
+    let volumeShockCoins = [];
+    if(currentCoinsData.length > 0) {
+        let avgVolume = currentCoinsData.reduce((sum, c) => sum + c.quoteVolume, 0) / currentCoinsData.length;
+        volumeShockCoins = currentCoinsData.filter(c => c.quoteVolume > avgVolume * 2).map(c => c.symbol);
+    }
+
     pairs.forEach(({pair,value}) => {
-        const el=document.createElement('div');el.className='stat-card';
+        const el=document.createElement('div');
+        el.className='stat-card';
+        if (volumeShockCoins.some(vc => pair.includes(vc))) {
+            el.classList.add('volume-shock-card');
+        }
         let cls=value>0.3?'positive':value<-0.3?'negative':'neutral';
         el.innerHTML=`<span class="stat-pair">${pair}</span><span class="stat-value ${cls}">${value>0?'+':''}${value.toFixed(4)}</span>`;
         DOM.statsGrid.appendChild(el);
@@ -385,30 +869,305 @@ function renderStats(matrix) {
     renderOpportunities(matrix, coins, pairs);
 }
 
-// ═══ Fırsat Avcısı (AI Algo) ═══
+// ═══ Fırsat Avcısı (AI Algo) + Zaman Makinesi (Backtest Engine) ═══
+
+/**
+ * BACKTEST ENGINE — Mean Reversion Z-Score Strategy
+ * 
+ * Gerçek fiyat verilerini kullanarak spread (oran) hesaplar,
+ * rolling z-score ile sapmaları yakalar ve simüle edilmiş
+ * giriş/çıkış işlemleriyle istatistik üretir.
+ */
+function runBacktest(pricesA, pricesB, isHedge = false) {
+    const n = Math.min(pricesA.length, pricesB.length);
+    if (n < 8) return null;
+
+    // Fiyat oranı (spread) hesapla
+    const spread = [];
+    for (let i = 0; i < n; i++) {
+        spread.push(pricesB[i] !== 0 ? pricesA[i] / pricesB[i] : 0);
+    }
+
+    // Rolling ortalama ve std hesapla (pencere = ~%30 veri uzunluğu, min 5)
+    const window = Math.max(5, Math.floor(n * 0.3));
+    const zScores = [];
+    for (let i = 0; i < n; i++) {
+        if (i < window - 1) { zScores.push(0); continue; }
+        let sum = 0, sq = 0;
+        for (let j = i - window + 1; j <= i; j++) { sum += spread[j]; sq += spread[j] * spread[j]; }
+        const mean = sum / window;
+        const variance = sq / window - mean * mean;
+        const std = Math.sqrt(Math.max(variance, 1e-12));
+        zScores.push((spread[i] - mean) / std);
+    }
+
+    // Z-score eşikleri: pairs trading için ±1.2 giriş, ±0.3 çıkış
+    const ENTRY_Z = isHedge ? 1.0 : 1.2;
+    const EXIT_Z = 0.3;
+
+    // Trade simülasyonu
+    const trades = [];
+    let inTrade = false, entryIdx = 0, entrySpread = 0, direction = 0;
+
+    for (let i = window; i < n; i++) {
+        const z = zScores[i];
+        if (!inTrade) {
+            if (z > ENTRY_Z) { inTrade = true; entryIdx = i; entrySpread = spread[i]; direction = -1; } // short spread
+            else if (z < -ENTRY_Z) { inTrade = true; entryIdx = i; entrySpread = spread[i]; direction = 1; } // long spread
+        } else {
+            const shouldExit = (direction === -1 && z <= EXIT_Z) || (direction === 1 && z >= -EXIT_Z) || i === n - 1;
+            if (shouldExit) {
+                const exitSpread = spread[i];
+                const returnPct = direction * ((exitSpread - entrySpread) / entrySpread) * 100;
+                trades.push({
+                    entryIdx, exitIdx: i,
+                    duration: i - entryIdx,
+                    returnPct,
+                    isWin: returnPct > 0
+                });
+                inTrade = false;
+            }
+        }
+    }
+
+    // İstatistik hesapla
+    const totalTrades = trades.length;
+    if (totalTrades === 0) return null;
+
+    const wins = trades.filter(t => t.isWin).length;
+    const winRate = (wins / totalTrades) * 100;
+    const returns = trades.map(t => t.returnPct);
+    const meanReturn = returns.reduce((a, b) => a + b, 0) / totalTrades;
+    
+    // Max drawdown (en kötü ardışık kayıp serisi)
+    let maxDD = 0, currentDD = 0;
+    for (const t of trades) {
+        if (t.returnPct < 0) { currentDD += Math.abs(t.returnPct); maxDD = Math.max(maxDD, currentDD); }
+        else currentDD = 0;
+    }
+
+    // Max ardışık kazanç
+    let maxStreak = 0, streak = 0;
+    for (const t of trades) {
+        if (t.isWin) { streak++; maxStreak = Math.max(maxStreak, streak); }
+        else streak = 0;
+    }
+
+    // Sharpe-benzeri oran (basitleştirilmiş)
+    const avgR = meanReturn;
+    const stdR = Math.sqrt(returns.reduce((s, r) => s + (r - avgR) ** 2, 0) / Math.max(totalTrades - 1, 1));
+    const sharpe = stdR > 0 ? (avgR / stdR) : 0;
+
+    // ${t("shp_med")}lama işlem süresi
+    const avgDuration = trades.reduce((s, t) => s + t.duration, 0) / totalTrades;
+
+    // En iyi ve en kötü tek işlem
+    const bestTrade = Math.max(...returns);
+    const worstTrade = Math.min(...returns);
+
+    // Toplam kümülatif getiri
+    const cumReturn = returns.reduce((a, b) => a + b, 0);
+
+    return {
+        totalTrades, wins, winRate,
+        meanReturn, maxDD, maxStreak,
+        sharpe, avgDuration, bestTrade, worstTrade, cumReturn
+    };
+}
+
 function renderOpportunities(matrix, coins, pairs) {
     const oppList = document.getElementById('opp-list');
     oppList.innerHTML = '';
     
-    // Yüksek korelasyon veya aşırı negatif sapma yakala
     let found = 0;
+    const periodLabel = CONFIG.periodMap[STATE.period].label;
+
     pairs.forEach(({pair, value}) => {
-        if (value > 0.85) {
+        const coin1 = pair.split(' ↔ ')[0];
+        const coin2 = pair.split(' ↔ ')[1];
+        const pricesA = STATE.lastPriceData?.[coin1];
+        const pricesB = STATE.lastPriceData?.[coin2];
+
+        if (value >= 0.85) {
             found++;
-            oppList.innerHTML += `<div style="padding:10px 14px; background:rgba(14,203,129,0.08); border-left:3px solid var(--green); border-radius:6px; font-size:0.85rem">
-                <span style="font-weight:700; color:var(--text-1)">🟢 Al/Sat Sinyali (${pair}):</span> ${pair.split(' ↔ ')[0]} ve ${pair.split(' ↔ ')[1]} şu an mükemmel bir uyum (r=<b>+${value.toFixed(2)}</b>) içinde! Tarihsel sapma tespit edildiğinde anında <b>Pairs Trading</b> fırsatı verebilir. İzlemeye alın.
+            let backtestHTML = '';
+            const bt = (pricesA && pricesB) ? runBacktest(pricesA, pricesB, false) : null;
+
+            if (bt && bt.totalTrades > 0) {
+                const winColor = bt.winRate >= 60 ? 'var(--green)' : bt.winRate >= 40 ? 'var(--accent)' : 'var(--red)';
+                const returnColor = bt.meanReturn > 0 ? 'var(--green)' : 'var(--red)';
+                const sharpeLabel = bt.sharpe >= 1.5 ? '${t("shp_exc")}' : bt.sharpe >= 0.8 ? '${t("shp_good")}' : bt.sharpe >= 0 ? '${t("shp_med")}' : '${t("shp_low")}';
+                const sharpeColor = bt.sharpe >= 1.5 ? 'var(--green)' : bt.sharpe >= 0.8 ? 'var(--accent)' : 'var(--text-3)';
+
+                backtestHTML = `
+                    <span class="backtest-badge">
+                        <span class="backtest-badge-icon">✅</span> ${t("backtest_badge").replace("✅ ", "")}
+                    </span>
+                    <div class="backtest-detail backtest-dashboard">
+                        <div class="bt-header">
+                            <span class="bt-engine-label">${t("bt_engine")}</span>
+                            <span class="bt-period-label">📅 ${t("bt_period", {p: periodLabel}).replace("📅 ","")}</span>
+                        </div>
+                        <div class="bt-summary-text">
+                            ${t("bt_desc", {p1: coin1, p2: coin2})}
+                        </div>
+                        <div class="bt-stats-grid">
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_tot")}</span>
+                                <span class="bt-stat-value">${bt.totalTrades}</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_win")}</span>
+                                <span class="bt-stat-value" style="color:var(--green)">${bt.wins} ✓</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_loss")}</span>
+                                <span class="bt-stat-value" style="color:var(--red)">${bt.totalTrades - bt.wins} ✗</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_rate")}</span>
+                                <span class="bt-stat-value" style="color:${winColor}">${bt.winRate.toFixed(1)}%</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_ret")}</span>
+                                <span class="bt-stat-value" style="color:${returnColor}">${bt.meanReturn > 0 ? '+' : ''}${bt.meanReturn.toFixed(2)}%</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_cum")}</span>
+                                <span class="bt-stat-value" style="color:${bt.cumReturn >= 0 ? 'var(--green)' : 'var(--red)'}">${bt.cumReturn > 0 ? '+' : ''}${bt.cumReturn.toFixed(2)}%</span>
+                            </div>
+                        </div>
+                        <div class="bt-progress-section">
+                            <div class="bt-progress-row">
+                                <span class="bt-prog-label">${t("bt_s_rate")}</span>
+                                <div class="bt-progress-track"><div class="bt-progress-fill green-fill" style="width:${Math.min(bt.winRate, 100)}%"></div></div>
+                                <span class="bt-prog-val" style="color:${winColor}">${bt.winRate.toFixed(0)}%</span>
+                            </div>
+                            <div class="bt-progress-row">
+                                <span class="bt-prog-label">${t("bt_s_dd")}</span>
+                                <div class="bt-progress-track"><div class="bt-progress-fill red-fill" style="width:${Math.min(bt.maxDD, 100)}%"></div></div>
+                                <span class="bt-prog-val" style="color:var(--red)">-${bt.maxDD.toFixed(1)}%</span>
+                            </div>
+                        </div>
+                        <div class="bt-extra-row">
+                            <span class="bt-extra-item">${t('bt_ex_str', {v: bt.maxStreak})}</span>
+                            <span class="bt-extra-item">${t('bt_ex_shp', {v: bt.sharpe.toFixed(2), l: sharpeLabel})}</span>
+                            <span class="bt-extra-item">⚡ En ${t("shp_good")}: <b style="color:var(--green)">+${bt.bestTrade.toFixed(2)}%</b></span>
+                            <span class="bt-extra-item">${t('bt_ex_wrst', {v: bt.worstTrade.toFixed(2)})}</span>
+                        </div>
+                    </div>`;
+            } else {
+                backtestHTML = `
+                    <span class="backtest-badge backtest-badge-nodata">
+                        <span class="backtest-badge-icon">📊</span> Backtest: Sinyal Yetersiz
+                    </span>`;
+            }
+
+            oppList.innerHTML += `
+            <div class="opp-card buy-signal">
+                <div class="opp-title">
+                    <span>${t("opp_pair", {p: pair})}</span>
+                    ${backtestHTML.includes('backtest-dashboard') ? '' : backtestHTML}
+                </div>
+                <div class="opp-body">
+                    ${t("opp_pair_desc", {p1: coin1, p2: coin2, v: value.toFixed(2)})}
+                    ${backtestHTML.includes('backtest-dashboard') ? backtestHTML : ''}
+                </div>
             </div>`;
-        } else if (value < -0.70) {
+
+        } else if (value <= -0.70) {
             found++;
-            oppList.innerHTML += `<div style="padding:10px 14px; background:rgba(246,70,93,0.08); border-left:3px solid var(--red); border-radius:6px; font-size:0.85rem">
-                <span style="font-weight:700; color:var(--text-1)">🔴 Hedge Fırsatı (${pair}):</span> <b>${value.toFixed(2)}</b> zıt korelasyon! Eğer portföyünüz tamamen ${pair.split(' ↔ ')[0]} içeriyorsa, ${pair.split(' ↔ ')[1]} alarak piyasa çöküşlerinden korunabilirsiniz.
+            let backtestHTML = '';
+            const bt = (pricesA && pricesB) ? runBacktest(pricesA, pricesB, true) : null;
+
+            if (bt && bt.totalTrades > 0) {
+                const winColor = bt.winRate >= 60 ? 'var(--green)' : bt.winRate >= 40 ? 'var(--accent)' : 'var(--red)';
+                const returnColor = bt.meanReturn > 0 ? 'var(--green)' : 'var(--red)';
+                const sharpeLabel = bt.sharpe >= 1.5 ? '${t("shp_exc")}' : bt.sharpe >= 0.8 ? '${t("shp_good")}' : bt.sharpe >= 0 ? '${t("shp_med")}' : '${t("shp_low")}';
+                const sharpeColor = bt.sharpe >= 1.5 ? 'var(--green)' : bt.sharpe >= 0.8 ? 'var(--accent)' : 'var(--text-3)';
+
+                backtestHTML = `
+                    <span class="backtest-badge red-badge">
+                        <span class="backtest-badge-icon">🛡️</span> ${t("hedge_badge").replace("🛡️ ", "")}
+                    </span>
+                    <div class="backtest-detail red-detail backtest-dashboard">
+                        <div class="bt-header">
+                            <span class="bt-engine-label">${t("bt_engine_h")}</span>
+                            <span class="bt-period-label">📅 ${t("bt_period", {p: periodLabel}).replace("📅 ","")}</span>
+                        </div>
+                        <div class="bt-summary-text">
+                            ${t("bt_desc_h", {p1: coin1, p2: coin2})}
+                        </div>
+                        <div class="bt-stats-grid">
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_tot_h")}</span>
+                                <span class="bt-stat-value">${bt.totalTrades}</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_win_h")}</span>
+                                <span class="bt-stat-value" style="color:var(--green)">${bt.wins} ✓</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_loss_h")}</span>
+                                <span class="bt-stat-value" style="color:var(--red)">${bt.totalTrades - bt.wins} ✗</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_rate_h")}</span>
+                                <span class="bt-stat-value" style="color:${winColor}">${bt.winRate.toFixed(1)}%</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_ret_h")}</span>
+                                <span class="bt-stat-value" style="color:${returnColor}">${bt.meanReturn > 0 ? '+' : ''}${bt.meanReturn.toFixed(2)}%</span>
+                            </div>
+                            <div class="bt-stat-item">
+                                <span class="bt-stat-label">${t("bt_s_cum_h")}</span>
+                                <span class="bt-stat-value" style="color:${bt.cumReturn >= 0 ? 'var(--green)' : 'var(--red)'}">${bt.cumReturn > 0 ? '+' : ''}${bt.cumReturn.toFixed(2)}%</span>
+                            </div>
+                        </div>
+                        <div class="bt-progress-section">
+                            <div class="bt-progress-row">
+                                <span class="bt-prog-label">${t("bt_s_rate_h")}</span>
+                                <div class="bt-progress-track"><div class="bt-progress-fill green-fill" style="width:${Math.min(bt.winRate, 100)}%"></div></div>
+                                <span class="bt-prog-val" style="color:${winColor}">${bt.winRate.toFixed(0)}%</span>
+                            </div>
+                            <div class="bt-progress-row">
+                                <span class="bt-prog-label">${t("bt_s_dd")}</span>
+                                <div class="bt-progress-track"><div class="bt-progress-fill red-fill" style="width:${Math.min(bt.maxDD, 100)}%"></div></div>
+                                <span class="bt-prog-val" style="color:var(--red)">-${bt.maxDD.toFixed(1)}%</span>
+                            </div>
+                        </div>
+                        <div class="bt-extra-row">
+                            <span class="bt-extra-item">${t('bt_ex_str', {v: bt.maxStreak})}</span>
+                            <span class="bt-extra-item">${t('bt_ex_shp', {v: bt.sharpe.toFixed(2), l: sharpeLabel})}</span>
+                            <span class="bt-extra-item">⚡ En ${t("shp_good")}: <b style="color:var(--green)">+${bt.bestTrade.toFixed(2)}%</b></span>
+                            <span class="bt-extra-item">${t('bt_ex_wrst', {v: bt.worstTrade.toFixed(2)})}</span>
+                        </div>
+                    </div>`;
+            } else {
+                backtestHTML = `
+                    <span class="backtest-badge red-badge backtest-badge-nodata">
+                        <span class="backtest-badge-icon">📊</span> Backtest: Sinyal Yetersiz
+                    </span>`;
+            }
+
+            oppList.innerHTML += `
+            <div class="opp-card hedge-signal">
+                <div class="opp-title">
+                    <span>${t("opp_hedge", {p: pair})}</span>
+                    ${backtestHTML.includes('backtest-dashboard') ? '' : backtestHTML}
+                </div>
+                <div class="opp-body">
+                    ${t("opp_hedge_desc", {p1: coin1, p2: coin2, v: value.toFixed(2)})}
+                    ${backtestHTML.includes('backtest-dashboard') ? backtestHTML : ''}
+                </div>
             </div>`;
         }
     });
 
     if (found === 0) {
-        oppList.innerHTML = `<div style="padding:10px 14px; background:rgba(255,255,255,0.02); border-left:3px solid var(--border-light); border-radius:6px; font-size:0.85rem; color:var(--text-3)">
-            Seçili matriste şu an için agresif bir korelasyon kopması veya arbitraj fırsatı tespit edilmedi. Daha geniş bir periyot veya farklı coinler deneyebilirsiniz.
+        oppList.innerHTML = `<div style="padding:14px 16px; background:rgba(255,255,255,0.02); border-left:3px solid var(--border-light); border-radius:8px; font-size:0.82rem; color:var(--text-3)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:1.1rem">🔍</span><strong style="color:var(--text-2)">${t("opp_none_lbl")}</strong></div>
+            ${t("opp_none")}
         </div>`;
     }
 }
@@ -485,7 +1244,7 @@ function showAnalysisLoader() {
     DOM.initialLoader.classList.add('hidden');
     DOM.coinSelector.classList.add('hidden');DOM.resultsSection.classList.add('hidden');
     DOM.analysisLoader.classList.remove('hidden');
-    DOM.loaderProgress.style.width='0%';DOM.loaderText.textContent='Veriler Analiz Ediliyor';
+    DOM.loaderProgress.style.width='0%';DOM.loaderText.textContent=t('stat_analyzing');
     DOM.navStatus.className='nav-status';DOM.navStatus.innerHTML='<span class="status-dot"></span>Analiz...';
 }
 function showResults() {
@@ -502,6 +1261,9 @@ function showResults() {
     DOM.cardPeriod.classList.add('interactive');
     DOM.cardMatrix.querySelector('.edit-icon').style.display = 'inline';
     DOM.cardPeriod.querySelector('.edit-icon').style.display = 'inline';
+    
+    // Alarm combobox güncelle
+    if(typeof updateAlarmPairSelect === 'function') updateAlarmPairSelect();
 }
 
 // ═══ Ana Akış ═══
@@ -525,7 +1287,7 @@ async function initApp() {
             }
         }
 
-        DOM.initialLoaderProgress.style.width='100%';DOM.initialLoaderText.textContent='Hazır';
+        DOM.initialLoaderProgress.style.width='100%';DOM.initialLoaderText.textContent=t('stat_ready');
         await sleep(300);
 
         // UI elemanlarını localStorage state'ine göre ayarla
@@ -655,10 +1417,10 @@ if(riskSearchInput) {
             riskPortfolio.push(val);
             e.target.value = '';
             document.getElementById('risk-portfolio-chips').innerHTML = riskPortfolio.map(c=>`<span class="chip">${c}</span>`).join('');
-            document.getElementById('risk-result-desc').innerHTML = `<b>${riskPortfolio.length}</b> coinin 30 günlük geçmişi taranıyor...`;
+            document.getElementById('risk-result-desc').innerHTML = `${t("scan_txt", {l: riskPortfolio.length})}`;
             setTimeout(() => {
                 document.getElementById('risk-result-box').style.borderLeftColor = "var(--red)";
-                document.getElementById('risk-result-desc').innerHTML = `<span style="color:var(--red);font-weight:700">%94 Çöküş Riski!</span> Cüzdanınızdaki varlıklar neredeyse birebir aynı yönde hareket ediyor. Portföyünüzü dengelemek için hemen <strong style="color:var(--accent)">Gold (PAXG)</strong> veya <strong style="color:var(--accent)">USDC</strong> bazlı risksiz sepetler ekleyin.`;
+                document.getElementById('risk-result-desc').innerHTML = `<span style="color:var(--red);font-weight:700">${t("risk_1")}</span> ${t("risk_2")}`;
             }, 1200);
         }
     });
@@ -879,11 +1641,205 @@ if(DOM.btnExportPNG) DOM.btnExportPNG.addEventListener('click', async () => {
     log('PNG olarak indirildi.', 'log');
 });
 
-// Info Modal Dinleyicisi
 const btnInfo = document.getElementById('btn-info');
 if(btnInfo) {
     btnInfo.addEventListener('click', () => {
         const modal = document.getElementById('modal-info');
         if(modal) modal.classList.remove('hidden');
     });
+}
+
+// ═══ CANLI ALARM & İZLEME LİSTESİ (WATCHLIST) ═══
+const ALARM_STATE = {
+    alarms: [], // { id, pair, coin1, coin2, condition (lt/gt), threshold, triggered: false }
+    audio: new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'),
+    intervalId: null
+};
+
+const domAlarmPairSelect = document.getElementById('alarm-pair-select');
+const domAlarmConditionSelect = document.getElementById('alarm-condition-select');
+const domAlarmThresholdInput = document.getElementById('alarm-threshold-input');
+const domBtnAddAlarm = document.getElementById('btn-add-alarm');
+const domAlarmWatchlist = document.getElementById('alarm-watchlist');
+const domAlarmLiveIndicator = document.getElementById('alarm-live-indicator');
+const domToastContainer = document.getElementById('toast-container');
+
+function updateAlarmPairSelect() {
+    if(!domAlarmPairSelect) return;
+    domAlarmPairSelect.innerHTML = '<option value="">Çift Seçin...</option>';
+    const coins = STATE.selectedCoins;
+    for(let i=0; i<coins.length; i++) {
+        for(let j=i+1; j<coins.length; j++) {
+            const pair = `${coins[i]} ↔ ${coins[j]}`;
+            domAlarmPairSelect.innerHTML += `<option value="${coins[i]}|${coins[j]}">${pair}</option>`;
+        }
+    }
+}
+
+function renderAlarms() {
+    if(ALARM_STATE.alarms.length === 0) {
+        domAlarmWatchlist.innerHTML = `<div style="padding:16px; text-align:center; color:var(--text-4); font-size:0.78rem;">t('alarm_empty'). Yukarıdan ilk alarmınızı ekleyin.</div>`;
+        domAlarmLiveIndicator.style.display = 'none';
+        return;
+    }
+    
+    domAlarmWatchlist.innerHTML = '';
+    ALARM_STATE.alarms.forEach(alarm => {
+        const el = document.createElement('div');
+        el.className = 'watchlist-item';
+        
+        const condText = alarm.condition === 'lt' ? '<' : '>';
+        const statusHTML = alarm.triggered ? 
+            `<span class="wl-status triggered">🚨 Çaldı</span>` : 
+            `<span class="wl-status active"><span class="live-dot" style="width:5px;height:5px;background:currentColor;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite"></span> Aktif</span>`;
+            
+        el.innerHTML = `
+            <div>
+                <div class="wl-pair">${alarm.pair}</div>
+                <div class="wl-condition">${condText} ${alarm.threshold.toFixed(2)} olursa tetikle</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px">
+                ${statusHTML}
+                <button class="wl-delete" data-id="${alarm.id}" title="Alarmı Sil">✕</button>
+            </div>
+        `;
+        domAlarmWatchlist.appendChild(el);
+    });
+    
+    document.querySelectorAll('.wl-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = parseInt(e.currentTarget.dataset.id);
+            ALARM_STATE.alarms = ALARM_STATE.alarms.filter(a => a.id !== id);
+            renderAlarms();
+            manageLiveScanner();
+        });
+    });
+    
+    domAlarmLiveIndicator.style.display = ALARM_STATE.alarms.some(a => !a.triggered) ? 'inline-flex' : 'none';
+}
+
+function appendToast(title, body, isAlert = false) {
+    const toast = document.createElement('div');
+    toast.className = `notif-toast ${isAlert ? 'alert-type' : ''}`;
+    toast.innerHTML = `
+        <div class="toast-icon">${isAlert ? '🚨' : '🔔'}</div>
+        <div class="toast-body">
+            <div class="toast-title">${title}</div>
+            <div class="toast-msg">${body}</div>
+        </div>
+        <button class="toast-close">✕</button>
+    `;
+    
+    domToastContainer.appendChild(toast);
+    
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+        toast.style.animation = 'toastSlideOut 0.4s ease-in forwards';
+        setTimeout(() => toast.remove(), 400);
+    });
+    
+    setTimeout(() => {
+        if(toast.parentElement) {
+            toast.style.animation = 'toastSlideOut 0.4s ease-in forwards';
+            setTimeout(() => toast.remove(), 400);
+        }
+    }, 6000);
+}
+
+function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+
+if(domBtnAddAlarm) {
+    domBtnAddAlarm.addEventListener('click', () => {
+        const pairVal = domAlarmPairSelect.value;
+        if(!pairVal) return alert('Lütfen bir coin çifti seçin.');
+        
+        requestNotificationPermission();
+        
+        const [coin1, coin2] = pairVal.split('|');
+        const condition = domAlarmConditionSelect.value;
+        const threshold = parseFloat(domAlarmThresholdInput.value);
+        
+        ALARM_STATE.alarms.push({
+            id: Date.now(),
+            pair: `${coin1} ↔ ${coin2}`,
+            coin1,
+            coin2,
+            condition,
+            threshold,
+            triggered: false
+        });
+        
+        renderAlarms();
+        manageLiveScanner();
+        
+        appendToast("Alarm Kuruldu", `${coin1} ↔ ${coin2} korelasyonu arka planda izleniyor. Ekran kilitli olsa bile sesli bildirim alacaksınız.`);
+    });
+}
+
+async function checkAlarms() {
+    const activeAlarms = ALARM_STATE.alarms.filter(a => !a.triggered);
+    if(activeAlarms.length === 0) return;
+    
+    // Yalnızca alarm kurulan coinleri çekelim
+    const coinsToFetch = new Set();
+    activeAlarms.forEach(a => { coinsToFetch.add(a.coin1); coinsToFetch.add(a.coin2); });
+    
+    try {
+        const prices = {};
+        for(let coin of coinsToFetch) {
+            prices[coin] = await fetchCoinPrices(coin);
+        }
+        
+        activeAlarms.forEach(alarm => {
+            if(!prices[alarm.coin1] || !prices[alarm.coin2]) return;
+            const currentCorr = pearson(prices[alarm.coin1], prices[alarm.coin2]);
+            
+            let isTriggered = false;
+            if(alarm.condition === 'lt' && currentCorr < alarm.threshold) isTriggered = true;
+            if(alarm.condition === 'gt' && currentCorr > alarm.threshold) isTriggered = true;
+            
+            if(isTriggered) {
+                alarm.triggered = true;
+                
+                // Ses Çal
+                ALARM_STATE.audio.play().catch(e => console.log("Audio play blocked by browser."));
+                
+                // HTML Toast
+                appendToast("🚨 Fırsat Radarı", `${alarm.pair} bağı ${alarm.condition === 'lt'?'koptu':'güçlendi'}! Mevcut Korelasyon: ${currentCorr.toFixed(2)} (${alarm.condition==='lt'?'<':'>'} ${alarm.threshold})`, true);
+                
+                // Browser Notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification("CryptoCorr Alarmı 🚨", {
+                        body: `${alarm.pair} korelasyonu ${currentCorr.toFixed(2)} seviyesine geldi!`,
+                        icon: "https://cryptologos.cc/logos/bitcoin-btc-logo.png"
+                    });
+                }
+            }
+        });
+        
+        // Eğer durumu değişen olduysa UI güncelle
+        if(activeAlarms.some(a => a.triggered)) {
+            renderAlarms();
+            manageLiveScanner();
+            // Ayrıca ana analiz paneli de açıkken grafiği yenilesin:
+            if(!STATE.isAnalyzing) runAnalysis();
+        }
+        
+    } catch(e) {
+        console.error("Alarm checker hatası:", e);
+    }
+}
+
+function manageLiveScanner() {
+    const hasActive = ALARM_STATE.alarms.some(a => !a.triggered);
+    if(hasActive && !ALARM_STATE.intervalId) {
+        // Her 2 dakikada bir kontrol eder.
+        ALARM_STATE.intervalId = setInterval(checkAlarms, 120000); 
+    } else if(!hasActive && ALARM_STATE.intervalId) {
+        clearInterval(ALARM_STATE.intervalId);
+        ALARM_STATE.intervalId = null;
+    }
 }
