@@ -507,7 +507,8 @@ const STATE = {
     lastPriceData: null,
     pendingSwapCoin: null,
     isLive: false,
-    liveIntervalRef: null
+    liveIntervalRef: null,
+    isPremium: false
 };
 
 const DOM = {
@@ -598,6 +599,11 @@ function loadStateFromURL() {
     if(params.has('matrix')) { STATE.matrixSize = parseInt(params.get('matrix')); loaded = true; }
     if(params.has('live')) { STATE.isLive = params.get('live') === 'true'; }
     
+    // Developer Bypass (Gizli Yönetici Kodu)
+    if(params.get('godmode') === '1') { 
+        STATE.isPremium = true; 
+    }
+    
     if(loaded && !params.has('matrix')) STATE.matrixSize = Math.max(5, STATE.selectedCoins.length);
     return loaded;
 }
@@ -608,7 +614,8 @@ function saveStateToLocal() {
         matrixSize: STATE.matrixSize,
         period: STATE.period,
         theme: STATE.theme,
-        isLive: STATE.isLive
+        isLive: STATE.isLive,
+        isPremium: STATE.isPremium
     }));
     updateURLParameters();
 }
@@ -622,6 +629,7 @@ function loadStateFromLocal() {
             STATE.period = saved.period || '30d';
             STATE.theme = saved.theme || 'ocean';
             STATE.isLive = saved.isLive || false;
+            STATE.isPremium = saved.isPremium || false;
         }
     } catch(e) { console.error("Storage err:", e); }
 }
@@ -1372,6 +1380,8 @@ async function initApp() {
         DOM.initialLoaderProgress.style.width='100%';DOM.initialLoaderText.textContent=t('stat_ready');
         await sleep(300);
 
+        if(STATE.isPremium) unlockPremiumFeatures(false);
+
         // UI elemanlarını localStorage state'ine göre ayarla
         document.querySelectorAll('#matrix-toggles .toggle-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.size) === STATE.matrixSize));
         document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === STATE.period));
@@ -1520,6 +1530,30 @@ DOM.btnBack.addEventListener('click', () => showSelector());
 DOM.swapSearchInput.addEventListener('input', e => renderSwapGrid(e.target.value));
 DOM.swapModalClose.addEventListener('click', () => DOM.swapModal.classList.add('hidden'));
 DOM.swapModal.addEventListener('click', e => { if(e.target===DOM.swapModal) DOM.swapModal.classList.add('hidden'); });
+
+// ═══ DEVELOPER BYPASS (GİZLİ KİLİT AÇMA) ═══
+let devClickCount = 0;
+let devClickTimer = null;
+const navBrand = document.querySelector('.nav-brand');
+if(navBrand) {
+    navBrand.style.cursor = 'pointer';
+    navBrand.title = "Sistem Versiyonu (v4.0)";
+    navBrand.addEventListener('click', () => {
+        devClickCount++;
+        clearTimeout(devClickTimer);
+        devClickTimer = setTimeout(() => { devClickCount = 0; }, 1200);
+        
+        if(devClickCount >= 5) {
+            devClickCount = 0;
+            if(!STATE.isPremium) {
+                STATE.isPremium = true;
+                saveStateToLocal();
+                if(typeof unlockPremiumFeatures === 'function') unlockPremiumFeatures(false);
+                if(typeof appendToast === 'function') appendToast("💻 Developer Mode", "Yönetici yetkileri (God Mode) algılandı. Tüm VIP özellikler ödeme yapılmaksızın test için açıldı.", false);
+            }
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => initApp());
 
@@ -2019,4 +2053,43 @@ function manageLiveScanner() {
         clearInterval(ALARM_STATE.intervalId);
         ALARM_STATE.intervalId = null;
     }
+}
+
+// ═══ PREMIUM MOCK FLOW ═══
+function unlockPremiumFeatures(showToast = true) {
+    document.querySelectorAll('.premium-blur-overlay').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.blur-content').forEach(el => el.classList.remove('blur-content'));
+    
+    // Coin listesindeki kilitleri kaldır
+    document.querySelectorAll('.coin-item .coin-vol, .swap-coin span:last-child').forEach(el => {
+        if(el.textContent.includes('PRO') || el.textContent.includes('🔒')) {
+            el.innerHTML = '<span style="color:var(--green)">✓ AÇIK</span>';
+        }
+    });
+
+    if(showToast && typeof appendToast === 'function') {
+        appendToast("💎 Premium Aktif", "Tüm profesyonel özelliklerin kilidi başarıyla açıldı. Analizlerinize kısıtlamasız devam edebilirsiniz.");
+    }
+}
+
+const btnMockPay = document.getElementById('btn-mock-pay');
+if(btnMockPay) {
+    btnMockPay.addEventListener('click', async () => {
+        const originalText = btnMockPay.innerHTML;
+        btnMockPay.innerHTML = '<span class="spinner" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:8px;border-width:2px;border-top-color:#fff"></span> Ödeme İşleniyor...';
+        btnMockPay.disabled = true;
+        
+        await sleep(1500); // 1.5s delay
+        
+        STATE.isPremium = true;
+        saveStateToLocal();
+        
+        unlockPremiumFeatures(true);
+        
+        const modalPremium = document.getElementById('modal-premium');
+        if(modalPremium) modalPremium.classList.add('hidden');
+        
+        btnMockPay.innerHTML = originalText;
+        btnMockPay.disabled = false;
+    });
 }
