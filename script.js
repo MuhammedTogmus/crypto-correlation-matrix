@@ -2520,6 +2520,9 @@ async function generatePDFReport() {
     btn.disabled = true;
 
     try {
+        if(typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+            throw new Error("jsPDF kütüphanesi yüklenemedi. Lütfen sayfayı yenilediğinizden emin olun.");
+        }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const pageW = doc.internal.pageSize.getWidth();
