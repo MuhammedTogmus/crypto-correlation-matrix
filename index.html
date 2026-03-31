@@ -2,9 +2,31 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="description" content="Kripto para korelasyon ısı haritası - Top 200 coin, 10x10 matris, 5 renk teması, AI Fırsat Avcısı PRO">
     <title>CryptoCorr | Korelasyon Analizi</title>
+
+    <!-- ═══ PWA Meta Tags ═══ -->
+    <meta name="theme-color" content="#FCD535">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CryptoCorr">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="CryptoCorr">
+    <meta name="msapplication-TileColor" content="#0B0E11">
+    <meta name="msapplication-TileImage" content="icon-192.png">
+    <meta name="msapplication-navbutton-color" content="#FCD535">
+
+    <!-- ═══ PWA Manifest ═══ -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- ═══ PWA Icons ═══ -->
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+
+    <!-- ═══ Fonts & Libraries ═══ -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -429,5 +451,35 @@
     </footer>
 
     <script src="script.js"></script>
+
+    <!-- ═══ PWA Service Worker Kaydı ═══ -->
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((registration) => {
+            console.log('✅ [PWA] Service Worker başarıyla kaydedildi. Scope:', registration.scope);
+            
+            // Yeni versiyon kontrolü
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              console.log('🔄 [PWA] Yeni Service Worker bulundu, güncelleniyor...');
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'activated') {
+                  // Kullanıcıya güncelleme bildirimi (opsiyonel toast)
+                  if (typeof showToast === 'function') {
+                    showToast('🔄 Uygulama güncellendi! Yeni özellikler yüklendi.', 'success');
+                  }
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.error('❌ [PWA] Service Worker kaydı başarısız:', error);
+          });
+      });
+    }
+    </script>
 </body>
 </html>

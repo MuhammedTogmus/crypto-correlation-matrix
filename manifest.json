@@ -1,0 +1,43 @@
+{
+  "name": "CryptoCorr Heatmap - Kripto Korelasyon Analizi",
+  "short_name": "CryptoCorr",
+  "description": "Kripto para korelasyon ısı haritası — Top 200 coin, 10x10 matris, AI Fırsat Avcısı PRO. Binance verileriyle gerçek zamanlı Pearson korelasyonu.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B0E11",
+  "theme_color": "#FCD535",
+  "lang": "tr",
+  "dir": "ltr",
+  "categories": ["finance", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Yeni Analiz Başlat",
+      "short_name": "Analiz",
+      "description": "Hızlıca yeni bir korelasyon analizi başlat",
+      "url": "./index.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
