@@ -31,6 +31,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -165,6 +168,7 @@
                     </div>
                     <button id="btn-export-csv" class="btn-outline" title="Matrisi CSV olarak İndir" style="border-color:var(--accent);color:var(--accent)">📊 CSV</button>
                     <button id="btn-export-png" class="btn-outline" title="Matrisi PNG olarak İndir" style="border-color:var(--accent);color:var(--accent)">🖼️ PNG</button>
+                    <button id="btn-export-pdf" class="btn-outline" title="PDF Raporu İndir (Premium)" style="border-color:#E040FB;color:#E040FB">📥 PDF <span class="premium-badge" style="font-size:0.55rem;padding:1px 5px">PRO</span></button>
                     <button id="btn-back" class="btn-outline">◀ Geri</button>
                     <button id="btn-refresh" class="btn-outline">↻ Yenile</button>
                 </div>
@@ -378,6 +382,9 @@
                     <li>⚡ <b>Hacim Şoku:</b> Matrix üzerinde para giriş çıkışlarını glow efektiyle takip edin.</li>
                     <li>🛡️ <b>Cüzdan Risk Testi:</b> İflas riskini hesaplayın, Hedge önerisi alın.</li>
                     <li>🌐 <b>Küresel Piyasalar:</b> DXY, S&P 500 ve XAU verisi ile büyük resmi görün.</li>
+                    <li>📈 <b>Overlay Grafik:</b> Matris hücresine tıklayıp iki coinin normalize fiyat hareketini karşılaştırın.</li>
+                    <li>📊 <b>Z-Score Anomali:</b> İstatistiksel arbitraj fırsatlarını otomatik algılayın.</li>
+                    <li>📥 <b>PDF Rapor:</b> Kurumsal düzeyde günlük PDF raporu tek tıkla indirin.</li>
                 </ul>
                 
                 <button class="btn-primary" id="btn-mock-pay" style="width:100%; padding:14px; font-size:1rem; margin-bottom:12px; background:#635BFF; color:white; box-shadow:0 4px 14px rgba(99, 91, 255, 0.3)">💳 Stripe ile Güvenli Öde</button>
@@ -431,6 +438,23 @@
                 </div>
                 
                 <button class="swap-modal-close" data-close="modal-alarm" style="width:100%; margin-top:20px;">Kapat</button>
+            </div>
+        </div>
+
+        <!-- ═══ Etkileşimli Kıyaslama Grafiği Modalı ═══ -->
+        <div id="modal-chart-overlay" class="swap-modal hidden">
+            <div class="swap-modal-content chart-overlay-modal">
+                <div class="chart-overlay-header">
+                    <h3 class="swap-modal-title" id="chart-overlay-title" style="margin-bottom:0; text-align:left; display:flex; align-items:center; gap:8px; flex:1">
+                        📈 Fiyat Kıyaslama
+                    </h3>
+                    <button class="chart-overlay-close-btn" data-close="modal-chart-overlay">✕</button>
+                </div>
+                <p class="swap-desc" id="chart-overlay-desc" style="margin-bottom:12px; text-align:left;">Son 30 günlük normalize fiyat hareketi (Baz: 100)</p>
+                <div id="chart-overlay-container" style="width:100%; height:350px; border-radius:10px; overflow:hidden; background:var(--bg-elevated); border:1px solid var(--border)"></div>
+                <div class="chart-overlay-legend" id="chart-overlay-legend"></div>
+                <div class="chart-overlay-corr" id="chart-overlay-corr"></div>
+                <button class="swap-modal-close" data-close="modal-chart-overlay" style="width:100%; margin-top:16px;">Kapat</button>
             </div>
         </div>
 

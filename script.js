@@ -118,7 +118,28 @@ const I18N = {
         risk_1: "94% Crash Risk!",
         risk_2: "Assets in your wallet move in identical directions. To balance your portfolio, immediately add risk-free baskets based on <strong style='color:var(--accent)'>Gold (PAXG)</strong> or <strong style='color:var(--accent)'>USDC</strong>.",
         scan_txt: "<b>{l}</b> coins scanned for 30-day history...",
-        period_lbl: "30 Days", p7d: "7 Days", p1d: "1 Day", p6h: "6 Hours"
+        period_lbl: "30 Days", p7d: "7 Days", p1d: "1 Day", p6h: "6 Hours",
+        // Chart Overlay
+        chart_title: "\ud83d\udcc8 Price Comparison",
+        chart_desc: "Last 30-day normalized price movement (Base: 100)",
+        chart_corr: "Pearson Correlation:",
+        chart_loading: "Loading price data...",
+        // Z-Score Anomaly
+        zscore_badge: "\ud83d\udea8 Critical Break: Z-Score Limit Exceeded!",
+        zscore_title: "\ud83d\udea8 Statistical Anomaly (Stat-Arb): {p}",
+        zscore_desc: "The correlation between {p1} and {p2} deviates from its historical moving average by <b>{z} standard deviations</b> (Z-Score: {zv}). A mathematical anomaly suggesting Mean Reversion arbitrage opportunity.",
+        // PDF Export
+        btn_pdf: "\ud83d\udce5 PDF",
+        pdf_generating: "Generating PDF...",
+        pdf_title: "CryptoCorr Premium Daily Report",
+        pdf_date: "Report Date:",
+        pdf_period: "Analysis Period:",
+        pdf_coins: "Selected Assets:",
+        pdf_risk: "Portfolio Risk Score:",
+        pdf_anomalies: "Z-Score Anomalies:",
+        pdf_no_anomaly: "No anomaly detected.",
+        pdf_footer: "Generated via CryptoCorr | Confidential",
+        pdf_done: "PDF report downloaded successfully."
     },
     tr: {
         nav_wait: "Bağlantı Bekleniyor",
@@ -235,7 +256,28 @@ const I18N = {
         risk_1: "%94 Çöküş Riski!",
         risk_2: "Cüzdanınızdaki varlıklar neredeyse birebir aynı yönde hareket ediyor. Portföyünüzü dengelemek için hemen <strong style='color:var(--accent)'>Gold (PAXG)</strong> veya <strong style='color:var(--accent)'>USDC</strong> bazlı risksiz sepetler ekleyin.",
         scan_txt: "<b>{l}</b> coinin 30 günlük geçmişi taranıyor...",
-        period_lbl: "30 Gün", p7d: "7 Gün", p1d: "1 Gün", p6h: "6 Saat"
+        period_lbl: "30 Gün", p7d: "7 Gün", p1d: "1 Gün", p6h: "6 Saat",
+        // Chart Overlay
+        chart_title: "📈 Fiyat Kıyaslama",
+        chart_desc: "Son 30 günlük normalize fiyat hareketi (Baz: 100)",
+        chart_corr: "Pearson Korelasyonu:",
+        chart_loading: "Fiyat verileri yükleniyor...",
+        // Z-Score Anomaly
+        zscore_badge: "🚨 Kritik Kırılım: Z-Score Sınırı Aşıldı!",
+        zscore_title: "🚨 Matematiksel Anomali (Stat-Arb): {p}",
+        zscore_desc: "{p1} ve {p2} korelasyonu, tarihsel hareketli ortalamasından <b>{z} standart sapma</b> dışına çıktı (Z-Score: {zv}). Ortalamaya Dönüş (Mean Reversion) arbitraj fırsatı doğabilir.",
+        // PDF Export
+        btn_pdf: "📥 PDF",
+        pdf_generating: "PDF oluşturuluyor...",
+        pdf_title: "CryptoCorr Premium Günlük Raporu",
+        pdf_date: "Rapor Tarihi:",
+        pdf_period: "Analiz Periyodu:",
+        pdf_coins: "Seçilen Varlıklar:",
+        pdf_risk: "Portföy Risk Skoru:",
+        pdf_anomalies: "Z-Score Anomalileri:",
+        pdf_no_anomaly: "Anomali tespit edilmedi.",
+        pdf_footer: "CryptoCorr ile oluşturuldu | Gizli",
+        pdf_done: "PDF raporu başarıyla indirildi."
     }
 };
 
@@ -896,6 +938,16 @@ function renderHeatmap(matrix) {
     });
     DOM.scaleGradient.style.background = theme.gradient;
     DOM.resultCoinsLabel.textContent = coins.join(' • ') + ` — Son ${CONFIG.periodMap[STATE.period].label}`;
+
+    // ═══ Hücre Tıklama — Overlay Chart Aç ═══
+    DOM.heatmapChart.removeAllListeners && DOM.heatmapChart.removeAllListeners('plotly_click');
+    DOM.heatmapChart.on('plotly_click', function(data) {
+        if(!data.points || !data.points.length) return;
+        const pt = data.points[0];
+        const coinA = pt.y, coinB = pt.x;
+        if(coinA === coinB) return; // Diagonal (kendisiyle korelasyon) — açma
+        openChartOverlay(coinA, coinB);
+    });
 }
 
 // ═══ İstatistikler (sağ panel) ═══
@@ -1218,6 +1270,55 @@ function renderOpportunities(matrix, coins, pairs) {
                 </div>
             </div>`;
         }
+    });
+
+    // ═══ Z-SCORE ANOMALI TARAMASI ═══
+    // Mevcut pair/hedge sinyallerinden BAĞIMSIZ olarak tüm çiftleri tara
+    lastZScoreResults = []; // Reset
+    
+    pairs.forEach(({pair, value}) => {
+        const coin1 = pair.split(' ↔ ')[0];
+        const coin2 = pair.split(' ↔ ')[1];
+        const pricesA = STATE.lastPriceData?.[coin1];
+        const pricesB = STATE.lastPriceData?.[coin2];
+
+        if(!pricesA || !pricesB) return;
+
+        const zResult = computeZScoreAnomaly(pricesA, pricesB);
+        if(!zResult || !zResult.isAnomaly) return;
+
+        found++;
+        lastZScoreResults.push({ pair, ...zResult });
+
+        const absZ = Math.abs(zResult.zscore).toFixed(2);
+        const direction = zResult.zscore > 0 ? '▲' : '▼';
+
+        oppList.innerHTML += `
+        <div class="opp-card zscore-signal">
+            <div class="opp-title">
+                <span>${t("zscore_title", {p: pair})}</span>
+                <span class="zscore-anomaly-badge">
+                    <span class="zscore-icon">🚨</span> ${t("zscore_badge").replace("🚨 ", "")}
+                </span>
+            </div>
+            <div class="opp-body">
+                ${t("zscore_desc", {p1: coin1, p2: coin2, z: absZ, zv: `${direction}${zResult.zscore}`})}
+                <div style="margin-top:10px; padding:10px 14px; background:rgba(255,23,68,0.06); border-radius:8px; border:1px solid rgba(255,23,68,0.15); display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center">
+                    <div>
+                        <div style="font-size:0.6rem; color:var(--text-4); text-transform:uppercase; margin-bottom:2px">Z-Score</div>
+                        <div style="font-family:var(--font-display); font-size:1rem; font-weight:800; color:#FF1744">${direction}${absZ}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.6rem; color:var(--text-4); text-transform:uppercase; margin-bottom:2px">Mevcut Corr</div>
+                        <div style="font-family:var(--font-display); font-size:1rem; font-weight:800; color:var(--text-1)">${zResult.currentCorr > 0 ? '+' : ''}${zResult.currentCorr}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.6rem; color:var(--text-4); text-transform:uppercase; margin-bottom:2px">Tarihsel Ort</div>
+                        <div style="font-family:var(--font-display); font-size:1rem; font-weight:800; color:var(--text-3)">${zResult.mean > 0 ? '+' : ''}${zResult.mean}</div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
     });
 
     if (found === 0) {
@@ -2092,4 +2193,422 @@ if(btnMockPay) {
         btnMockPay.innerHTML = originalText;
         btnMockPay.disabled = false;
     });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ═══ ÖZELLİK 1: ETKİLEŞİMLİ KIYASLAMA GRAFİĞİ ═══
+// ═══════════════════════════════════════════════════════════════
+
+let chartOverlayInstance = null;
+
+async function openChartOverlay(coinA, coinB) {
+    const modal = document.getElementById('modal-chart-overlay');
+    const container = document.getElementById('chart-overlay-container');
+    const titleEl = document.getElementById('chart-overlay-title');
+    const descEl = document.getElementById('chart-overlay-desc');
+    const legendEl = document.getElementById('chart-overlay-legend');
+    const corrEl = document.getElementById('chart-overlay-corr');
+
+    // Modal aç
+    modal.classList.remove('hidden');
+    titleEl.innerHTML = `${t('chart_title')} — <span style="color:var(--green)">${coinA}</span> vs <span style="color:#2196F3">${coinB}</span>`;
+    descEl.textContent = t('chart_desc');
+    container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-3);font-size:0.85rem;gap:8px"><span class="spinner" style="width:18px;height:18px;border-width:2px"></span> ${t('chart_loading')}</div>`;
+    legendEl.innerHTML = '';
+    corrEl.innerHTML = '';
+
+    try {
+        // 30 günlük günlük kapanış fiyatlarını çek
+        const [pricesA, pricesB] = await Promise.all([
+            fetchKlinesForChart(coinA),
+            fetchKlinesForChart(coinB)
+        ]);
+
+        const minLen = Math.min(pricesA.length, pricesB.length);
+        if(minLen < 2) throw new Error('Veri yetersiz');
+
+        // Normalize et (ilk günü 100 bazında)
+        const baseA = pricesA[0].value;
+        const baseB = pricesB[0].value;
+        const normA = pricesA.slice(0, minLen).map(p => ({ time: p.time, value: (p.value / baseA) * 100 }));
+        const normB = pricesB.slice(0, minLen).map(p => ({ time: p.time, value: (p.value / baseB) * 100 }));
+
+        // Pearson korelasyonu hesapla
+        const rawA = normA.map(p => p.value);
+        const rawB = normB.map(p => p.value);
+        const corrValue = pearson(rawA, rawB);
+
+        // Container temizle
+        container.innerHTML = '';
+
+        // Lightweight Charts oluştur
+        if(chartOverlayInstance) {
+            chartOverlayInstance.remove();
+            chartOverlayInstance = null;
+        }
+
+        const chart = LightweightCharts.createChart(container, {
+            width: container.clientWidth,
+            height: container.clientHeight,
+            layout: {
+                background: { type: 'solid', color: '#14171c' },
+                textColor: '#848e9c',
+                fontSize: 11,
+                fontFamily: 'Inter, sans-serif'
+            },
+            grid: {
+                vertLines: { color: 'rgba(43,49,57,0.5)' },
+                horzLines: { color: 'rgba(43,49,57,0.5)' }
+            },
+            crosshair: {
+                mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: { color: 'rgba(252,213,53,0.3)', width: 1, style: 2, labelBackgroundColor: '#FCD535' },
+                horzLine: { color: 'rgba(252,213,53,0.3)', width: 1, style: 2, labelBackgroundColor: '#FCD535' }
+            },
+            rightPriceScale: {
+                borderColor: '#2b3139',
+                scaleMargins: { top: 0.1, bottom: 0.1 }
+            },
+            timeScale: {
+                borderColor: '#2b3139',
+                timeVisible: false
+            },
+            handleScroll: true,
+            handleScale: true
+        });
+        chartOverlayInstance = chart;
+
+        // Coin A — Yeşil
+        const seriesA = chart.addLineSeries({
+            color: '#0ecb81',
+            lineWidth: 2,
+            crosshairMarkerVisible: true,
+            crosshairMarkerRadius: 4,
+            priceFormat: { type: 'custom', formatter: v => v.toFixed(1) }
+        });
+        seriesA.setData(normA);
+
+        // Coin B — Mavi
+        const seriesB = chart.addLineSeries({
+            color: '#2196F3',
+            lineWidth: 2,
+            crosshairMarkerVisible: true,
+            crosshairMarkerRadius: 4,
+            priceFormat: { type: 'custom', formatter: v => v.toFixed(1) }
+        });
+        seriesB.setData(normB);
+
+        chart.timeScale().fitContent();
+
+        // Legend
+        legendEl.innerHTML = `
+            <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#0ecb81"></span> <span style="color:var(--green)">${coinA}</span></span>
+            <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#2196F3"></span> <span style="color:#2196F3">${coinB}</span></span>
+        `;
+
+        // Korelasyon göstergesi
+        const corrColor = corrValue > 0.3 ? 'var(--green)' : corrValue < -0.3 ? 'var(--red)' : 'var(--text-3)';
+        corrEl.innerHTML = `${t('chart_corr')} <strong style="color:${corrColor}">${corrValue > 0 ? '+' : ''}${corrValue.toFixed(4)}</strong>`;
+
+        // Resize observer
+        const resizeObs = new ResizeObserver(() => {
+            if(chart && container.clientWidth > 0) {
+                chart.applyOptions({ width: container.clientWidth });
+            }
+        });
+        resizeObs.observe(container);
+
+        // Modal kapandığında temizle
+        modal._resizeObs = resizeObs;
+
+    } catch(e) {
+        container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--red);font-size:0.82rem">❌ Veri yüklenemedi: ${e.message}</div>`;
+    }
+}
+
+async function fetchKlinesForChart(symbol) {
+    const params = new URLSearchParams({ symbol: `${symbol}USDT`, interval: '1d', limit: 30 });
+    const res = await fetch(`${CONFIG.baseUrl}/klines?${params}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}: ${symbol}`);
+    const klines = await res.json();
+    return klines.map(k => ({
+        time: Math.floor(k[0] / 1000), // Unix timestamp (seconds)
+        value: parseFloat(k[4])          // Kapanış fiyatı
+    }));
+}
+
+// Chart overlay modal kapatma
+document.addEventListener('click', e => {
+    if(e.target.closest('[data-close="modal-chart-overlay"]')) {
+        document.getElementById('modal-chart-overlay').classList.add('hidden');
+        if(chartOverlayInstance) {
+            chartOverlayInstance.remove();
+            chartOverlayInstance = null;
+        }
+        const modal = document.getElementById('modal-chart-overlay');
+        if(modal._resizeObs) {
+            modal._resizeObs.disconnect();
+            modal._resizeObs = null;
+        }
+    }
+});
+document.getElementById('modal-chart-overlay')?.addEventListener('click', e => {
+    if(e.target === e.currentTarget) {
+        e.currentTarget.classList.add('hidden');
+        if(chartOverlayInstance) { chartOverlayInstance.remove(); chartOverlayInstance = null; }
+    }
+});
+
+
+// ═══════════════════════════════════════════════════════════════
+// ═══ ÖZELLİK 2: İSTATİSTİKSEL ARBİTRAJ (Z-SCORE) İNDİKATÖRÜ ═══
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Bir coin çiftinin mevcut korelasyonunun, tarihsel hareketli
+ * ortalamasından ne kadar sapma gösterdiğini hesaplar.
+ * 
+ * @param {number[]} pricesA - Coin A fiyat dizisi
+ * @param {number[]} pricesB - Coin B fiyat dizisi
+ * @returns {object|null} { zscore, mean, std, isAnomaly }
+ */
+function computeZScoreAnomaly(pricesA, pricesB) {
+    const n = Math.min(pricesA.length, pricesB.length);
+    if(n < 10) return null;
+
+    // Rolling korelasyon penceresi: veri uzunluğunun ~40%'ı, minimum 5
+    const windowSize = Math.max(5, Math.floor(n * 0.4));
+    
+    // Her pencerede ayrı korelasyon hesapla
+    const correlations = [];
+    for(let end = windowSize; end <= n; end++) {
+        const startIdx = end - windowSize;
+        const sliceA = pricesA.slice(startIdx, end);
+        const sliceB = pricesB.slice(startIdx, end);
+        correlations.push(pearson(sliceA, sliceB));
+    }
+
+    if(correlations.length < 3) return null;
+
+    // Mevcut korelasyon (tüm veri üzerinden)
+    const currentCorr = pearson(pricesA.slice(0, n), pricesB.slice(0, n));
+
+    // Tarihsel rolling korelasyonların ortalaması ve std'si
+    const mean = correlations.reduce((s, v) => s + v, 0) / correlations.length;
+    const variance = correlations.reduce((s, v) => s + (v - mean) ** 2, 0) / correlations.length;
+    const std = Math.sqrt(Math.max(variance, 1e-12));
+
+    // Z-Score: mevcut korelasyon ne kadar sapıyor?
+    const zscore = (currentCorr - mean) / std;
+
+    return {
+        zscore: parseFloat(zscore.toFixed(2)),
+        mean: parseFloat(mean.toFixed(4)),
+        std: parseFloat(std.toFixed(4)),
+        currentCorr: parseFloat(currentCorr.toFixed(4)),
+        isAnomaly: Math.abs(zscore) >= 2.0
+    };
+}
+
+// Z-Score sonuçlarını global olarak tutmak (PDF raporu için de kullanılacak)
+let lastZScoreResults = [];
+
+
+// ═══════════════════════════════════════════════════════════════
+// ═══ ÖZELLİK 3: KURUMSAL PDF RAPOR ÇIKTISI ═══
+// ═══════════════════════════════════════════════════════════════
+
+const domBtnExportPDF = document.getElementById('btn-export-pdf');
+
+if(domBtnExportPDF) {
+    domBtnExportPDF.addEventListener('click', async () => {
+        if(!STATE.isPremium) {
+            document.getElementById('modal-premium')?.classList.remove('hidden');
+            return;
+        }
+        await generatePDFReport();
+    });
+}
+
+async function generatePDFReport() {
+    if(!STATE.lastPriceData || !STATE.selectedCoins.length) return;
+
+    const btn = domBtnExportPDF;
+    const origHTML = btn.innerHTML;
+    btn.innerHTML = `<span class="spinner" style="width:12px;height:12px;display:inline-block;vertical-align:middle;border-width:2px;border-top-color:#E040FB;margin-right:6px"></span> ${t('pdf_generating')}`;
+    btn.disabled = true;
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const coins = STATE.selectedCoins;
+
+        // Arka plan
+        doc.setFillColor(11, 14, 17);
+        doc.rect(0, 0, pageW, pageH, 'F');
+
+        // Başlık bandı
+        doc.setFillColor(30, 35, 41);
+        doc.rect(0, 0, pageW, 28, 'F');
+        doc.setFillColor(252, 213, 53);
+        doc.rect(0, 27, pageW, 1, 'F');
+
+        // Başlık
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor(252, 213, 53);
+        doc.text('CryptoCorr Premium Daily Report', 14, 13);
+        doc.setFontSize(9);
+        doc.setTextColor(184, 189, 198);
+        doc.text(`${t('pdf_date')} ${new Date().toLocaleDateString('tr-TR', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })}`, 14, 21);
+        doc.text(`${t('pdf_period')} ${CONFIG.periodMap[STATE.period].label}`, pageW - 14, 21, { align: 'right' });
+
+        // Seçilen coinler
+        let yPos = 36;
+        doc.setFontSize(10);
+        doc.setTextColor(234, 236, 239);
+        doc.setFont('helvetica', 'bold');
+        doc.text(t('pdf_coins'), 14, yPos);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(183, 189, 198);
+        doc.text(coins.join('  •  '), 55, yPos);
+
+        // Heatmap görselini yakala
+        yPos += 8;
+        try {
+            const heatmapEl = document.getElementById('heatmap-chart');
+            if(heatmapEl) {
+                const canvas = await html2canvas(heatmapEl, {
+                    backgroundColor: '#14171c',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                });
+                const imgData = canvas.toDataURL('image/png');
+                const imgW = Math.min(pageW - 28, 180);
+                const imgH = imgW * (canvas.height / canvas.width);
+                doc.addImage(imgData, 'PNG', 14, yPos, imgW, Math.min(imgH, 100));
+                yPos += Math.min(imgH, 100) + 6;
+            }
+        } catch(imgErr) {
+            console.warn('Heatmap görsel yakalanamadı:', imgErr);
+            yPos += 6;
+        }
+
+        // Korelasyon matrisi tablosu (metin olarak)
+        const matrix = buildMatrix(STATE.lastPriceData);
+        if(yPos > pageH - 70) yPos = 36; // Eğer sayfa taşıyorsa matrisi es geç
+
+        // Portföy Risk Skoru
+        let riskSection_yPos = yPos;
+        doc.setFillColor(30, 35, 41);
+        doc.roundedRect(pageW - 100, 36, 86, 28, 3, 3, 'F');
+        doc.setFontSize(9);
+        doc.setTextColor(132, 142, 156);
+        doc.setFont('helvetica', 'bold');
+        doc.text(t('pdf_risk'), pageW - 96, 45);
+
+        // Risk skoru hesapla (tüm çiftlerin ort. korelasyon abs)
+        let totalCorr = 0, pairCount = 0;
+        for(let i = 0; i < coins.length; i++) {
+            for(let j = i+1; j < coins.length; j++) {
+                totalCorr += Math.abs(matrix[i][j]);
+                pairCount++;
+            }
+        }
+        const avgCorrAbs = pairCount > 0 ? totalCorr / pairCount : 0;
+        const riskPercent = Math.round(avgCorrAbs * 100);
+        const riskColor = riskPercent >= 70 ? [246,70,93] : riskPercent >= 40 ? [252,213,53] : [14,203,129];
+        const riskLabel = riskPercent >= 70 ? 'YÜKSEK' : riskPercent >= 40 ? 'ORTA' : 'DÜŞÜK';
+
+        doc.setFontSize(18);
+        doc.setTextColor(riskColor[0], riskColor[1], riskColor[2]);
+        doc.text(`${riskPercent}%`, pageW - 96, 58);
+        doc.setFontSize(8);
+        doc.text(riskLabel, pageW - 76, 58);
+
+        // Z-Score Anomalileri
+        doc.setFontSize(10);
+        doc.setTextColor(234, 236, 239);
+        doc.setFont('helvetica', 'bold');
+        doc.text(t('pdf_anomalies'), 14, yPos + 4);
+        yPos += 10;
+
+        if(lastZScoreResults.length > 0) {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            lastZScoreResults.forEach((zr, idx) => {
+                if(yPos > pageH - 30) return;
+                doc.setTextColor(255, 23, 68);
+                doc.text(`🚨 ${zr.pair}`, 18, yPos);
+                doc.setTextColor(183, 189, 198);
+                doc.text(`Z-Score: ${zr.zscore} | Corr: ${zr.currentCorr} | Mean: ${zr.mean}`, 65, yPos);
+                yPos += 5;
+            });
+        } else {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(132, 142, 156);
+            doc.text(t('pdf_no_anomaly'), 18, yPos);
+            yPos += 5;
+        }
+
+        // En güçlü korelasyon çiftleri
+        yPos += 4;
+        if(yPos < pageH - 40) {
+            doc.setFontSize(10);
+            doc.setTextColor(234, 236, 239);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Top Correlation Pairs', 14, yPos);
+            yPos += 6;
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+
+            const pairs = [];
+            for(let i = 0; i < coins.length; i++) {
+                for(let j = i+1; j < coins.length; j++) {
+                    pairs.push({ pair: `${coins[i]} ↔ ${coins[j]}`, value: matrix[i][j] });
+                }
+            }
+            pairs.sort((a,b) => Math.abs(b.value) - Math.abs(a.value));
+            pairs.slice(0, 8).forEach(p => {
+                if(yPos > pageH - 20) return;
+                const color = p.value > 0.3 ? [14,203,129] : p.value < -0.3 ? [246,70,93] : [132,142,156];
+                doc.setTextColor(183, 189, 198);
+                doc.text(p.pair, 18, yPos);
+                doc.setTextColor(color[0], color[1], color[2]);
+                doc.text(`${p.value > 0 ? '+' : ''}${p.value.toFixed(4)}`, 70, yPos);
+                yPos += 5;
+            });
+        }
+
+        // Footer
+        doc.setFillColor(30, 35, 41);
+        doc.rect(0, pageH - 12, pageW, 12, 'F');
+        doc.setFontSize(7);
+        doc.setTextColor(94, 102, 115);
+        doc.text(t('pdf_footer'), pageW / 2, pageH - 5, { align: 'center' });
+        doc.setTextColor(252, 213, 53);
+        doc.text('CryptoCorr', 14, pageH - 5);
+        doc.text(new Date().toISOString().split('T')[0], pageW - 14, pageH - 5, { align: 'right' });
+
+        // İndir
+        doc.save(`CryptoCorr_Premium_Report_${STATE.period}_${new Date().toISOString().split('T')[0]}.pdf`);
+
+        if(typeof appendToast === 'function') {
+            appendToast('📥 PDF Raporu', t('pdf_done'));
+        }
+        log('PDF raporu oluşturuldu ve indirildi.', 'log');
+
+    } catch(e) {
+        console.error('PDF Hatası:', e);
+        if(typeof appendToast === 'function') {
+            appendToast('❌ Hata', `PDF oluşturulurken bir hata oluştu: ${e.message}`, true);
+        }
+    } finally {
+        btn.innerHTML = origHTML;
+        btn.disabled = false;
+    }
 }

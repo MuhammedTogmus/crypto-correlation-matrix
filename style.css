@@ -741,3 +741,185 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     line-height: 1.6;
     font-size: 0.78rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* ═══ CHART OVERLAY MODAL — Etkileşimli Kıyaslama Grafiği ═══  */
+/* ═══════════════════════════════════════════════════════════════ */
+.chart-overlay-modal {
+    max-width: 720px !important;
+    width: 100% !important;
+    padding: 20px 24px !important;
+    background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-elevated) 100%) !important;
+    border: 1px solid var(--accent-dim) !important;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 40px rgba(252,213,53,0.08) !important;
+}
+.chart-overlay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+.chart-overlay-close-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-3);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.chart-overlay-close-btn:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: rgba(246,70,93,0.1);
+}
+.chart-overlay-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 0 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.chart-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+}
+.chart-overlay-corr {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-3);
+    padding: 8px 0 0;
+}
+.chart-overlay-corr strong {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+}
+
+@media(max-width:600px) {
+    .chart-overlay-modal {
+        max-width: 95vw !important;
+        padding: 16px !important;
+    }
+    #chart-overlay-container {
+        height: 260px !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* ═══ Z-SCORE ANOMALY BADGE — Stat-Arb İndikatörü ═══          */
+/* ═══════════════════════════════════════════════════════════════ */
+.zscore-anomaly-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, rgba(255,23,68,0.18), rgba(255,23,68,0.08));
+    border: 1px solid rgba(255,23,68,0.5);
+    color: #FF1744;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    margin-left: 6px;
+    vertical-align: middle;
+    box-shadow: 0 0 14px rgba(255,23,68,0.3), 0 0 40px rgba(255,23,68,0.1), inset 0 0 8px rgba(255,23,68,0.06);
+    animation: zscoreNeonPulse 1.5s infinite ease-in-out;
+    cursor: default;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+    text-shadow: 0 0 8px rgba(255,23,68,0.6);
+}
+.zscore-anomaly-badge .zscore-icon {
+    font-size: 0.85rem;
+    animation: badgeIconBounce 1.2s ease-in-out infinite;
+}
+@keyframes zscoreNeonPulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(255,23,68,0.25), 0 0 20px rgba(255,23,68,0.08), inset 0 0 4px rgba(255,23,68,0.04); text-shadow: 0 0 4px rgba(255,23,68,0.4); }
+    50%      { box-shadow: 0 0 22px rgba(255,23,68,0.5), 0 0 60px rgba(255,23,68,0.2), inset 0 0 12px rgba(255,23,68,0.1); text-shadow: 0 0 12px rgba(255,23,68,0.8), 0 0 24px rgba(255,23,68,0.4); }
+}
+
+.opp-card.zscore-signal {
+    background: rgba(255,23,68,0.06);
+    border-left-color: #FF1744;
+    position: relative;
+    overflow: hidden;
+}
+.opp-card.zscore-signal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,23,68,0.04), transparent);
+    animation: zscoreScanLine 3s infinite linear;
+    pointer-events: none;
+}
+@keyframes zscoreScanLine {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Z-Score stat card highlight in correlation panel */
+.zscore-shock-card {
+    border-left: 4px solid #FF1744 !important;
+    background: rgba(255,23,68,0.06) !important;
+    animation: zscoreBoxFlash 2s infinite alternate ease-in-out;
+    position: relative;
+}
+.zscore-shock-card::after {
+    content: '📊';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
+    animation: zscoreNeonPulse 1.5s infinite;
+}
+@keyframes zscoreBoxFlash {
+    from { box-shadow: inset 0 0 0 transparent, 0 0 0 transparent; }
+    to   { box-shadow: inset 0 0 12px rgba(255,23,68,0.12), 0 0 8px rgba(255,23,68,0.08); }
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* ═══ PDF EXPORT BUTTON ═══                                     */
+/* ═══════════════════════════════════════════════════════════════ */
+#btn-export-pdf {
+    transition: var(--ease);
+    position: relative;
+    overflow: hidden;
+}
+#btn-export-pdf:hover {
+    border-color: #E040FB !important;
+    color: #E040FB !important;
+    background: rgba(224,64,251,0.08) !important;
+    box-shadow: 0 0 16px rgba(224,64,251,0.2);
+}
+#btn-export-pdf::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(224,64,251,0.08), transparent);
+    transition: 0.5s;
+}
+#btn-export-pdf:hover::after {
+    left: 100%;
+}
