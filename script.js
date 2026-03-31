@@ -354,12 +354,20 @@ function updateStaticUI() {
     // Modals
     const mt = document.querySelectorAll('.swap-modal-title');
     mt.forEach(m => {
-        if(m.textContent.includes('Hangi coin') || m.textContent.includes('Which coin')) m.textContent = "Hangi coin ile değiştirilsin? / Which coin to swap with?";
-        if(m.textContent.includes('Periyot')) m.textContent = t('per_lbl').replace(':','') + " Edit";
-        if(m.textContent.includes('Matris Boyutu')) m.textContent = t('mat_size_title') || "New Matrix Size";
+        if(m.innerHTML.includes('Hangi') || m.innerHTML.includes('Which')) m.textContent = userLang === "en" ? "Which coin to swap with?" : "Hangi coin ile değiştirilsin?";
+        if(m.parentElement.parentElement.id === 'modal-period') m.textContent = userLang === "en" ? "Period Edit" : "Periyot Değiştir";
+        if(m.parentElement.parentElement.id === 'modal-matrix-size') m.textContent = userLang === 'en' ? "New Matrix Size" : "Yeni Matris Boyutu Seçin";
         if(m.id === 'reduce-title') m.innerHTML = t('mat_reduce');
         if(m.id === 'increase-title') m.innerHTML = t('mat_inc');
     });
+
+    // Landing Page i18n
+    const tLandingTitle = userLang === "en" ? "AI-Powered Crypto Correlation Terminal" : "Yapay Zeka Destekli Kripto Korelasyon Terminali";
+    const tLandingDesc = userLang === "en" ? "Protect your portfolio with institutional-grade mathematical arbitrage and risk management tools." : "Kurumsal fonların kullandığı matematiksel arbitraj ve risk yönetim araçlarıyla portföyünüzü koruyun.";
+    const tLandingBtn = userLang === "en" ? "🚀 Start Free Analysis (Top 10 Coin)" : "🚀 Ücretsiz Analize Başla (Top 10 Coin)";
+    const elLT = document.getElementById('landing-title-text'); if(elLT) elLT.textContent = tLandingTitle;
+    const elLD = document.getElementById('landing-desc-text'); if(elLD) elLD.textContent = tLandingDesc;
+    const elLB = document.getElementById('btn-landing-start'); if(elLB) elLB.textContent = tLandingBtn;
     
     document.querySelectorAll('[data-close]').forEach(b => {
         if(b.textContent.includes('İptal') || b.textContent.includes('Cancel')) b.textContent = t('cancel');
@@ -1551,19 +1559,33 @@ function setTheme(themeName) {
 }
 
 // ═══ Ekran Geçişleri ═══
+function showLanding() {
+    DOM.initialLoader.classList.add('hidden');
+    DOM.analysisLoader.classList.add('hidden');
+    DOM.resultsSection.classList.add('hidden');
+    DOM.coinSelector.classList.add('hidden');
+    const lp = document.getElementById('landing-page'); if(lp) lp.classList.remove('hidden');
+    DOM.navStatus.className='nav-status live';DOM.navStatus.innerHTML='<span class="status-dot"></span>' + (userLang==='en'?'Ready':'Hazır');
+    DOM.cardMatrix.classList.remove('interactive');
+    DOM.cardPeriod.classList.remove('interactive');
+    if(DOM.cardMatrix.querySelector('.edit-icon')) DOM.cardMatrix.querySelector('.edit-icon').style.display = 'none';
+    if(DOM.cardPeriod.querySelector('.edit-icon')) DOM.cardPeriod.querySelector('.edit-icon').style.display = 'none';
+}
 function showSelector() {
     DOM.initialLoader.classList.add('hidden');DOM.analysisLoader.classList.add('hidden');DOM.resultsSection.classList.add('hidden');
+    const lp = document.getElementById('landing-page'); if(lp) lp.classList.add('hidden');
     DOM.coinSelector.classList.remove('hidden');
-    DOM.navStatus.className='nav-status live';DOM.navStatus.innerHTML='<span class="status-dot"></span>Hazır';
+    DOM.navStatus.className='nav-status live';DOM.navStatus.innerHTML='<span class="status-dot"></span>' + (userLang==='en'?'Ready':'Hazır');
     
     // Matris ve Periyot düzenleme ikonlarını gizle
     DOM.cardMatrix.classList.remove('interactive');
     DOM.cardPeriod.classList.remove('interactive');
-    DOM.cardMatrix.querySelector('.edit-icon').style.display = 'none';
-    DOM.cardPeriod.querySelector('.edit-icon').style.display = 'none';
+    if(DOM.cardMatrix.querySelector('.edit-icon')) DOM.cardMatrix.querySelector('.edit-icon').style.display = 'none';
+    if(DOM.cardPeriod.querySelector('.edit-icon')) DOM.cardPeriod.querySelector('.edit-icon').style.display = 'none';
 }
 function showAnalysisLoader() {
     DOM.initialLoader.classList.add('hidden');
+    const lp = document.getElementById('landing-page'); if(lp) lp.classList.add('hidden');
     DOM.coinSelector.classList.add('hidden');DOM.resultsSection.classList.add('hidden');
     DOM.analysisLoader.classList.remove('hidden');
     DOM.loaderProgress.style.width='0%';DOM.loaderText.textContent=t('stat_analyzing');
@@ -1571,6 +1593,7 @@ function showAnalysisLoader() {
 }
 function showResults() {
     DOM.initialLoader.classList.add('hidden');
+    const lp = document.getElementById('landing-page'); if(lp) lp.classList.add('hidden');
     DOM.analysisLoader.classList.add('hidden');DOM.coinSelector.classList.add('hidden');
     DOM.resultsSection.classList.remove('hidden');
     DOM.displayMatrix.textContent=`${STATE.selectedCoins.length}×${STATE.selectedCoins.length}`;
@@ -1624,10 +1647,14 @@ async function initApp() {
         renderCoinList(STATE.allCoins); renderChips(); updateSelectionUI(); 
         
         // Eğer her şey tamsa doğrudan grafiği çizdir
-        if(STATE.selectedCoins.length === STATE.matrixSize && STATE.selectedCoins.length > 0) {
-            runAnalysis();
+        if(STATE.selectedCoins.length > 0) {
+            if(STATE.selectedCoins.length === STATE.matrixSize) {
+                runAnalysis();
+            } else {
+                showSelector();
+            }
         } else {
-            showSelector();
+            showLanding();
         }
     } catch(e) {
         log(`Hata: ${e.message}`,'error');
@@ -1788,6 +1815,24 @@ if(navBrand) {
 }
 
 document.addEventListener('DOMContentLoaded', () => initApp());
+
+const btnLandingStart = document.getElementById('btn-landing-start');
+if(btnLandingStart) {
+    btnLandingStart.addEventListener('click', () => {
+        const lp = document.getElementById('landing-page');
+        if(lp) lp.style.animation = 'fadeUp 0.4s ease-out reverse forwards';
+        setTimeout(() => {
+            if(lp) { lp.classList.add('hidden'); lp.style.animation = ''; }
+            STATE.matrixSize = 10;
+            const top10 = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE', 'AVAX', 'LINK', 'DOT'];
+            STATE.selectedCoins = top10.filter(s => STATE.allCoins.some(c => c.symbol === s));
+            if(STATE.selectedCoins.length !== STATE.matrixSize) STATE.matrixSize = Math.max(5, STATE.selectedCoins.length);
+            saveStateToLocal();
+            updateSelectionUI();
+            runAnalysis();
+        }, 380);
+    });
+}
 
 // ═══ METRIC CARD MODALLAR ═══
 // Matris modalını aç
