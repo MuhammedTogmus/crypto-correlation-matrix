@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="description" content="Kripto para korelasyon ısı haritası - Top 200 coin, 10x10 matris, 5 renk teması, AI Fırsat Avcısı PRO">
+    <meta name="description"
+        content="Kripto para korelasyon ısı haritası - Top 200 coin, 10x10 matris, 5 renk teması, AI Fırsat Avcısı PRO">
     <title>CryptoCorr | Korelasyon Analizi</title>
 
     <!-- ═══ PWA Meta Tags ═══ -->
@@ -29,13 +31,16 @@
     <!-- ═══ Fonts & Libraries ═══ -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- NOTIFICATION TOAST CONTAINER -->
@@ -45,7 +50,11 @@
     <nav id="navbar">
         <div class="nav-inner">
             <div class="nav-brand">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#FCD535"/><path d="M14 6L18.5 10.5L16.4 12.6L14 10.2L11.6 12.6L9.5 10.5L14 6Z" fill="#181A20"/><path d="M14 22L9.5 17.5L11.6 15.4L14 17.8L16.4 15.4L18.5 17.5L14 22Z" fill="#181A20"/></svg>
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <rect width="28" height="28" rx="6" fill="#FCD535" />
+                    <path d="M14 6L18.5 10.5L16.4 12.6L14 10.2L11.6 12.6L9.5 10.5L14 6Z" fill="#181A20" />
+                    <path d="M14 22L9.5 17.5L11.6 15.4L14 17.8L16.4 15.4L18.5 17.5L14 22Z" fill="#181A20" />
+                </svg>
                 <span class="brand-name">CryptoCorr</span>
                 <span class="brand-badge">HEATMAP</span>
             </div>
@@ -60,17 +69,28 @@
                         <span class="slider"></span>
                     </div>
                 </label>
-                <button id="btn-alarm" class="btn-ghost" style="padding:5px 12px; font-size:0.75rem; border-color:var(--accent); color:var(--accent); display:flex; align-items:center; gap:6px; font-weight:700" title="Korelasyon Alarmları Kur" data-open="modal-alarm">
+                <button id="btn-alarm" class="btn-ghost"
+                    style="padding:5px 12px; font-size:0.75rem; border-color:var(--accent); color:var(--accent); display:flex; align-items:center; gap:6px; font-weight:700"
+                    title="Korelasyon Alarmları Kur" data-open="modal-alarm">
                     🔔 Canlı Alarm
                 </button>
-                <button id="btn-risk" class="btn-ghost" style="padding:5px 12px; font-size:0.75rem; border-color:var(--red); color:var(--red); display:flex; align-items:center; gap:6px; font-weight:700" title="Portföyünü Test Et" data-open="modal-risk">
+                <button id="btn-risk" class="btn-ghost"
+                    style="padding:5px 12px; font-size:0.75rem; border-color:var(--red); color:var(--red); display:flex; align-items:center; gap:6px; font-weight:700"
+                    title="Portföyünü Test Et" data-open="modal-risk">
                     🛡️ Risk Testi
                 </button>
-                <button id="btn-info" class="btn-ghost" style="padding:4px 10px; font-size:0.8rem; border-color:transparent; display:flex; align-items:center; gap:6px" title="Trader Eğitim Kılavuzu" data-open="modal-info">
-                    <span style="border:1.5px solid currentColor; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold">i</span> Nasıl Okunur?
+                <button id="btn-info" class="btn-ghost"
+                    style="padding:4px 10px; font-size:0.8rem; border-color:transparent; display:flex; align-items:center; gap:6px"
+                    title="Trader Eğitim Kılavuzu" data-open="modal-info">
+                    <span
+                        style="border:1.5px solid currentColor; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold">i</span>
+                    Nasıl Okunur?
                 </button>
                 <span id="nav-time">--:--</span>
-                <button id="btn-lang" class="btn-ghost" style="padding:4px 10px; font-size:0.8rem; border-color:transparent; display:flex; align-items:center; gap:6px; font-weight:700" title="Change Language"><span style="font-size:1.1rem">🌍</span> <span id="lang-text">EN</span></button>
+                <button id="btn-lang" class="btn-ghost"
+                    style="padding:4px 10px; font-size:0.8rem; border-color:transparent; display:flex; align-items:center; gap:6px; font-weight:700"
+                    title="Change Language"><span style="font-size:1.1rem">🌍</span> <span
+                        id="lang-text">EN</span></button>
             </div>
         </div>
     </nav>
@@ -79,10 +99,16 @@
 
         <!-- Metrikler -->
         <section id="metrics-bar">
-            <div class="metric-card"><span class="metric-label">Kaynak</span><span class="metric-value"><span class="metric-icon">◆</span> Binance</span></div>
-            <div class="metric-card" id="card-matrix" title="Matrisi Değiştir"><span class="metric-label">Matris <span class="metric-icon edit-icon" style="opacity:0.7;display:none">✎</span></span><span class="metric-value" id="display-matrix">—</span></div>
-            <div class="metric-card" id="card-period" title="Periyodu Değiştir"><span class="metric-label">Periyot <span class="metric-icon edit-icon" style="opacity:0.7;display:none">✎</span></span><span class="metric-value" id="display-period">30 Gün</span></div>
-            <div class="metric-card"><span class="metric-label">Metod</span><span class="metric-value">Pearson</span></div>
+            <div class="metric-card"><span class="metric-label">Kaynak</span><span class="metric-value"><span
+                        class="metric-icon">◆</span> Binance</span></div>
+            <div class="metric-card" id="card-matrix" title="Matrisi Değiştir"><span class="metric-label">Matris <span
+                        class="metric-icon edit-icon" style="opacity:0.7;display:none">✎</span></span><span
+                    class="metric-value" id="display-matrix">—</span></div>
+            <div class="metric-card" id="card-period" title="Periyodu Değiştir"><span class="metric-label">Periyot <span
+                        class="metric-icon edit-icon" style="opacity:0.7;display:none">✎</span></span><span
+                    class="metric-value" id="display-period">30 Gün</span></div>
+            <div class="metric-card"><span class="metric-label">Metod</span><span class="metric-value">Pearson</span>
+            </div>
         </section>
 
         <!-- İLK YÜKLEME -->
@@ -90,7 +116,9 @@
             <div class="loader-box">
                 <div class="spinner"></div>
                 <p class="loader-title" id="initial-loader-text">Piyasa Verileri Yükleniyor</p>
-                <div class="progress-track"><div class="progress-bar" id="initial-loader-progress"></div></div>
+                <div class="progress-track">
+                    <div class="progress-bar" id="initial-loader-progress"></div>
+                </div>
                 <p class="loader-desc" id="initial-loader-subtext">Binance'den en hacimli 200 coin çekiliyor...</p>
             </div>
         </section>
@@ -98,7 +126,10 @@
         <!-- COİN SEÇİM -->
         <section id="coin-selector" class="hidden">
             <div class="selector-top">
-                <div><h1 class="selector-title">Coin Seçimi</h1><p class="selector-desc">Korelasyon analizi için coinlerinizi seçin</p></div>
+                <div>
+                    <h1 class="selector-title">Coin Seçimi</h1>
+                    <p class="selector-desc">Korelasyon analizi için coinlerinizi seçin</p>
+                </div>
                 <div class="toggle-group">
                     <div class="toggle-section">
                         <span class="toggle-label">Matris:</span>
@@ -125,7 +156,10 @@
             </div>
             <div class="search-row">
                 <div class="search-box">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
                     <input type="text" id="coin-search-input" placeholder="Coin ara..." autocomplete="off">
                     <button id="btn-clear-search" class="search-clear hidden">✕</button>
                 </div>
@@ -144,7 +178,9 @@
             <div class="loader-box">
                 <div class="spinner"></div>
                 <p class="loader-title" id="loader-text">Veriler Analiz Ediliyor</p>
-                <div class="progress-track"><div class="progress-bar" id="loader-progress"></div></div>
+                <div class="progress-track">
+                    <div class="progress-bar" id="loader-progress"></div>
+                </div>
                 <p class="loader-desc" id="loader-subtext">Fiyat verileri çekiliyor...</p>
             </div>
         </section>
@@ -160,15 +196,24 @@
                 <div class="result-actions">
                     <!-- Renk tema seçici -->
                     <div class="theme-selector">
-                        <button class="theme-dot active" data-theme="ocean" title="Okyanus" style="background:linear-gradient(135deg,#FF1744,#2196F3,#00E676)"></button>
-                        <button class="theme-dot" data-theme="fire" title="Ateş" style="background:linear-gradient(135deg,#1565C0,#FF6D00,#FFD600)"></button>
-                        <button class="theme-dot" data-theme="neon" title="Neon" style="background:linear-gradient(135deg,#E040FB,#1E2329,#00FFFF)"></button>
-                        <button class="theme-dot" data-theme="classic" title="Klasik" style="background:linear-gradient(135deg,#D32F2F,#FAFAFA,#1976D2)"></button>
-                        <button class="theme-dot" data-theme="sunset" title="Gün Batımı" style="background:linear-gradient(135deg,#4A148C,#FF5722,#FFC107)"></button>
+                        <button class="theme-dot active" data-theme="ocean" title="Okyanus"
+                            style="background:linear-gradient(135deg,#FF1744,#2196F3,#00E676)"></button>
+                        <button class="theme-dot" data-theme="fire" title="Ateş"
+                            style="background:linear-gradient(135deg,#1565C0,#FF6D00,#FFD600)"></button>
+                        <button class="theme-dot" data-theme="neon" title="Neon"
+                            style="background:linear-gradient(135deg,#E040FB,#1E2329,#00FFFF)"></button>
+                        <button class="theme-dot" data-theme="classic" title="Klasik"
+                            style="background:linear-gradient(135deg,#D32F2F,#FAFAFA,#1976D2)"></button>
+                        <button class="theme-dot" data-theme="sunset" title="Gün Batımı"
+                            style="background:linear-gradient(135deg,#4A148C,#FF5722,#FFC107)"></button>
                     </div>
-                    <button id="btn-export-csv" class="btn-outline" title="Matrisi CSV olarak İndir" style="border-color:var(--accent);color:var(--accent)">📊 CSV</button>
-                    <button id="btn-export-png" class="btn-outline" title="Matrisi PNG olarak İndir" style="border-color:var(--accent);color:var(--accent)">🖼️ PNG</button>
-                    <button id="btn-export-pdf" class="btn-outline" title="PDF Raporu İndir (Premium)" style="border-color:#E040FB;color:#E040FB">📥 PDF <span class="premium-badge" style="font-size:0.55rem;padding:1px 5px">PRO</span></button>
+                    <button id="btn-export-csv" class="btn-outline" title="Matrisi CSV olarak İndir"
+                        style="border-color:var(--accent);color:var(--accent)">📊 CSV</button>
+                    <button id="btn-export-png" class="btn-outline" title="Matrisi PNG olarak İndir"
+                        style="border-color:var(--accent);color:var(--accent)">🖼️ PNG</button>
+                    <button id="btn-export-pdf" class="btn-outline" title="PDF Raporu İndir (Premium)"
+                        style="border-color:#E040FB;color:#E040FB">📥 PDF <span class="premium-badge"
+                            style="font-size:0.55rem;padding:1px 5px">PRO</span></button>
                     <button id="btn-back" class="btn-outline">◀ Geri</button>
                     <button id="btn-refresh" class="btn-outline">↻ Yenile</button>
                 </div>
@@ -177,11 +222,15 @@
             <!-- Heatmap + İstatistikler yan yana -->
             <div class="result-body">
                 <div class="result-left">
-                    <div class="chart-wrapper"><div id="heatmap-chart"></div></div>
+                    <div class="chart-wrapper">
+                        <div id="heatmap-chart"></div>
+                    </div>
                     <!-- Volume Shock Banner -->
-                    <div id="volume-shock-banner" style="display:none; padding:8px 14px; background:rgba(255,235,59,0.06); border:1px solid rgba(255,235,59,0.2); border-radius:8px; margin-top:8px; font-size:0.75rem; color:var(--neon-yellow); display:flex; align-items:center; gap:8px;">
+                    <div id="volume-shock-banner"
+                        style="display:none; padding:8px 14px; background:rgba(255,235,59,0.06); border:1px solid rgba(255,235,59,0.2); border-radius:8px; margin-top:8px; font-size:0.75rem; color:var(--neon-yellow); display:flex; align-items:center; gap:8px;">
                         <span style="font-size:1.1rem">⚡</span>
-                        <span id="volume-shock-info">Hacim Şoku tespit edildi — Matris üzerinde neon sarı ile vurgulanıyor.</span>
+                        <span id="volume-shock-info">Hacim Şoku tespit edildi — Matris üzerinde neon sarı ile
+                            vurgulanıyor.</span>
                     </div>
                     <div class="scale-bar">
                         <span class="scale-label">−1.0 Negatif</span>
@@ -196,19 +245,28 @@
             </div>
 
             <!-- Fırsat Avcısı (AI Scanner) with Backtest -->
-            <div id="opportunity-scanner" class="premium-container swap-section" style="position:relative; overflow:hidden">
+            <div id="opportunity-scanner" class="premium-container swap-section"
+                style="position:relative; overflow:hidden">
                 <div class="swap-header" style="display:flex; align-items:center; justify-content:space-between">
                     <div>
-                        <h3 class="swap-title" style="display:flex; align-items:center; gap:6px"><span style="font-size:1.1rem">🤖</span> AI Fırsat Avcısı <span class="premium-badge">PRO</span></h3>
-                        <p class="swap-desc">Korelasyon anomalilerini ve "Ortalamaya Dönüş" (Mean Reversion) fırsatlarını anında yakalar. <b>Zaman Makinesi (Backtest)</b> ile tarihsel kanıt sunar.</p>
+                        <h3 class="swap-title" style="display:flex; align-items:center; gap:6px"><span
+                                style="font-size:1.1rem">🤖</span> AI Fırsat Avcısı <span
+                                class="premium-badge">PRO</span></h3>
+                        <p class="swap-desc">Korelasyon anomalilerini ve "Ortalamaya Dönüş" (Mean Reversion)
+                            fırsatlarını anında yakalar. <b>Zaman Makinesi (Backtest)</b> ile tarihsel kanıt sunar.</p>
                     </div>
                 </div>
-                
+
                 <div class="premium-blur-overlay" id="opp-lock-overlay">
                     <span class="lock-icon" style="font-size:2rem; margin-bottom:10px; display:block">🔒</span>
-                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Fırsat Avcısı & Zaman Makinesi Kilitli</h4>
-                    <p style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">Algoritmik Al/Sat sinyallerini, Backtest sonuçlarını ve anomalileri görmek için Premium'a geçin.</p>
-                    <button class="btn-primary" data-open="modal-premium" style="font-size:0.8rem; padding:8px 20px">Aylık $29.99 - Kilidi Aç</button>
+                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Fırsat Avcısı &
+                        Zaman Makinesi Kilitli</h4>
+                    <p
+                        style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">
+                        Algoritmik Al/Sat sinyallerini, Backtest sonuçlarını ve anomalileri görmek için Premium'a geçin.
+                    </p>
+                    <button class="btn-primary" data-open="modal-premium"
+                        style="font-size:0.8rem; padding:8px 20px">Aylık $29.99 - Kilidi Aç</button>
                 </div>
 
                 <div id="opp-content" class="opportunity-content blur-content">
@@ -225,7 +283,10 @@
                     <p class="swap-desc">Bir coin seçin, ardından matristeki değiştirmek istediğiniz coine tıklayın</p>
                 </div>
                 <div class="swap-search">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
                     <input type="text" id="swap-search-input" placeholder="Coin ara..." autocomplete="off">
                 </div>
                 <div class="swap-grid" id="swap-grid"></div>
@@ -276,9 +337,12 @@
         <div id="modal-matrix-reduce" class="swap-modal hidden">
             <div class="swap-modal-content">
                 <h4 class="swap-modal-title" id="reduce-title">Çıkarılacak Olan Coini Seçin</h4>
-                <div id="reduce-options" style="gap:8px; display:flex; flex-direction:column; align-items:stretch; max-height:260px; overflow-y:auto; padding-right:5px; margin-bottom:8px"></div>
+                <div id="reduce-options"
+                    style="gap:8px; display:flex; flex-direction:column; align-items:stretch; max-height:260px; overflow-y:auto; padding-right:5px; margin-bottom:8px">
+                </div>
                 <div class="action-row" style="margin-top:16px; width:100%; justify-content:stretch;">
-                    <button class="btn-primary" id="btn-confirm-reduce" style="width:100%; padding:12px;" disabled>Onayla ve Uygula</button>
+                    <button class="btn-primary" id="btn-confirm-reduce" style="width:100%; padding:12px;"
+                        disabled>Onayla ve Uygula</button>
                 </div>
                 <button class="swap-modal-close" data-close="modal-matrix-reduce" style="margin-top:8px;">İptal</button>
             </div>
@@ -289,14 +353,19 @@
             <div class="swap-modal-content" style="max-width:440px; width:100%;">
                 <h4 class="swap-modal-title" id="increase-title">Eklenecek Coini Seçin</h4>
                 <div class="swap-search" style="max-width:100%;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
                     <input type="text" id="increase-search-input" placeholder="Coin ara..." autocomplete="off">
                 </div>
                 <div class="swap-grid" id="increase-grid" style="max-height:200px; margin-bottom:16px;"></div>
                 <div class="action-row" style="margin-top:16px; width:100%; justify-content:stretch;">
-                    <button class="btn-primary" id="btn-confirm-increase" style="width:100%; padding:12px;" disabled>Onayla ve Analiz Et</button>
+                    <button class="btn-primary" id="btn-confirm-increase" style="width:100%; padding:12px;"
+                        disabled>Onayla ve Analiz Et</button>
                 </div>
-                <button class="swap-modal-close" data-close="modal-matrix-increase" style="margin-top:8px;">İptal</button>
+                <button class="swap-modal-close" data-close="modal-matrix-increase"
+                    style="margin-top:8px;">İptal</button>
             </div>
         </div>
 
@@ -304,90 +373,129 @@
         <div id="modal-info" class="swap-modal hidden">
             <div class="swap-modal-content" style="max-width:480px; width:100%;">
                 <h3 class="swap-modal-title" style="margin-bottom:8px">Pearson Korelasyonu Nedir?</h3>
-                <p class="swap-desc" style="margin-bottom:20px; text-align:center;">Bu ısı haritası, kripto paraların fiyat hareketlerinin birbirlerine olan benzerliğini <b>-1.0</b> ile <b>+1.0</b> arasında ölçer.</p>
-                
+                <p class="swap-desc" style="margin-bottom:20px; text-align:center;">Bu ısı haritası, kripto paraların
+                    fiyat hareketlerinin birbirlerine olan benzerliğini <b>-1.0</b> ile <b>+1.0</b> arasında ölçer.</p>
+
                 <div style="display:flex; flex-direction:column; gap:12px">
-                    <div style="padding:12px; background:rgba(14,203,129,0.1); border-left:4px solid var(--green); border-radius:6px">
+                    <div
+                        style="padding:12px; background:rgba(14,203,129,0.1); border-left:4px solid var(--green); border-radius:6px">
                         <span style="color:var(--green); font-weight:700">+1.0 (Güçlü Pozitif)</span>
-                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">İki coin aynı anda düşüp aynı anda yükseliyor demektir. Biri rallideyken diğeri de uçar.</p>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">İki coin aynı anda düşüp aynı
+                            anda yükseliyor demektir. Biri rallideyken diğeri de uçar.</p>
                     </div>
-                    <div style="padding:12px; background:rgba(246,70,93,0.1); border-left:4px solid var(--red); border-radius:6px">
+                    <div
+                        style="padding:12px; background:rgba(246,70,93,0.1); border-left:4px solid var(--red); border-radius:6px">
                         <span style="color:var(--red); font-weight:700">-1.0 (Güçlü Negatif)</span>
-                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Zıt yönlü hareket. Biri yükselirken diğeri düşer. Piyasayı karşılıklı hedge etmek için mükemmeldir!</p>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Zıt yönlü hareket. Biri
+                            yükselirken diğeri düşer. Piyasayı karşılıklı hedge etmek için mükemmeldir!</p>
                     </div>
-                    <div style="padding:12px; background:rgba(255,255,255,0.05); border-left:4px solid var(--text-3); border-radius:6px">
+                    <div
+                        style="padding:12px; background:rgba(255,255,255,0.05); border-left:4px solid var(--text-3); border-radius:6px">
                         <span style="color:var(--text-3); font-weight:700">0.0 (Nötr / Bağımsız)</span>
-                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Aralarında mantıklı veya orantılı hiçbir bağ yoktur. Birinin hareketi diğerini etkilemez.</p>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Aralarında mantıklı veya
+                            orantılı hiçbir bağ yoktur. Birinin hareketi diğerini etkilemez.</p>
                     </div>
-                    <div style="padding:12px; background:rgba(255,235,59,0.08); border-left:4px solid var(--neon-yellow, #ffeb3b); border-radius:6px">
-                        <span style="color:#ffeb3b; font-weight:700; text-shadow:0 0 10px rgba(255,235,59,0.4)">⚡ Hacim Şoku (Neon Sarı Parlama)</span>
-                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Matris üzerinde <b>Neon Sarı</b> parlayan coinler, son 24 saatte anormal işlem hacmi artışı (Kurumsal Para Girişi, Pump, veya Likidite Değişimi) tespit edilmiş coinlerdir. Bu coinlerin hacmi, gruptaki ortalamanın <b>2 katını</b> aşmıştır. Sadece fiyata değil hacme de bakarak tuzaklardan kaçının!</p>
+                    <div
+                        style="padding:12px; background:rgba(255,235,59,0.08); border-left:4px solid var(--neon-yellow, #ffeb3b); border-radius:6px">
+                        <span style="color:#ffeb3b; font-weight:700; text-shadow:0 0 10px rgba(255,235,59,0.4)">⚡ Hacim
+                            Şoku (Neon Sarı Parlama)</span>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">Matris üzerinde <b>Neon
+                                Sarı</b> parlayan coinler, son 24 saatte anormal işlem hacmi artışı (Kurumsal Para
+                            Girişi, Pump, veya Likidite Değişimi) tespit edilmiş coinlerdir. Bu coinlerin hacmi,
+                            gruptaki ortalamanın <b>2 katını</b> aşmıştır. Sadece fiyata değil hacme de bakarak
+                            tuzaklardan kaçının!</p>
                     </div>
-                    <div style="padding:12px; background:rgba(14,203,129,0.05); border-left:4px solid rgba(14,203,129,0.5); border-radius:6px">
+                    <div
+                        style="padding:12px; background:rgba(14,203,129,0.05); border-left:4px solid rgba(14,203,129,0.5); border-radius:6px">
                         <span style="color:var(--green); font-weight:700">🤖 Tarihsel Başarı (Backtest) Rozeti</span>
-                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">AI Fırsat Avcısı bölümünde yeşil rozetler, sinyalin son 30 günlük geriye dönük testindeki performansı gösterir. Kaç kez kazandırdığı, ortalama getiri oranı ve başarı yüzdesi matematiksel olarak hesaplanır.</p>
+                        <p style="font-size:0.8rem; color:var(--text-2); margin-top:4px">AI Fırsat Avcısı bölümünde
+                            yeşil rozetler, sinyalin son 30 günlük geriye dönük testindeki performansı gösterir. Kaç kez
+                            kazandırdığı, ortalama getiri oranı ve başarı yüzdesi matematiksel olarak hesaplanır.</p>
                     </div>
                 </div>
-                
-                <button class="btn-primary" data-close="modal-info" style="width:100%; margin-top:20px; padding:12px">Anladım, Bol Kazançlar!</button>
+
+                <button class="btn-primary" data-close="modal-info"
+                    style="width:100%; margin-top:20px; padding:12px">Anladım, Bol Kazançlar!</button>
             </div>
         </div>
 
         <!-- Cüzdan Risk Skoru Modalı -->
         <div id="modal-risk" class="swap-modal hidden">
             <div class="swap-modal-content" style="max-width:500px; width:100%; position:relative; overflow:hidden;">
-                <h3 class="swap-modal-title" style="margin-bottom:4px; text-align:left; display:flex; align-items:center; gap:8px">
+                <h3 class="swap-modal-title"
+                    style="margin-bottom:4px; text-align:left; display:flex; align-items:center; gap:8px">
                     🛡️ Portföy Risk Skoru <span class="premium-badge">PRO</span>
                 </h3>
-                <p class="swap-desc" style="margin-bottom:20px; text-align:left;">Cüzdanınızdaki coinleri seçin. Tüm yatırımınızın aynı anda çökme riskini analiz edip koruma (Hedge) tavsiyesi sunalım.</p>
-                
+                <p class="swap-desc" style="margin-bottom:20px; text-align:left;">Cüzdanınızdaki coinleri seçin. Tüm
+                    yatırımınızın aynı anda çökme riskini analiz edip koruma (Hedge) tavsiyesi sunalım.</p>
+
                 <div class="premium-blur-overlay" style="border-radius:12px; z-index:10">
                     <span class="lock-icon" style="font-size:2rem; margin-bottom:10px; display:block">🔒</span>
-                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Risk Analizi Kilitli</h4>
-                    <p style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">İflastan korunmak ve dinamik Hedge tavsiyesi almak için Premium'a geçin.</p>
-                    <button class="btn-primary" data-open="modal-premium" style="font-size:0.8rem; padding:8px 20px">Hemen Kilidi Aç</button>
+                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Risk Analizi
+                        Kilitli</h4>
+                    <p
+                        style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">
+                        İflastan korunmak ve dinamik Hedge tavsiyesi almak için Premium'a geçin.</p>
+                    <button class="btn-primary" data-open="modal-premium"
+                        style="font-size:0.8rem; padding:8px 20px">Hemen Kilidi Aç</button>
                 </div>
 
                 <div class="blur-content">
                     <div class="swap-search" style="max-width:100%; margin-bottom:12px">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="text" id="risk-search-input" placeholder="Cüzdanındaki coini ara (Örn: SOL)..." autocomplete="off">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input type="text" id="risk-search-input" placeholder="Cüzdanındaki coini ara (Örn: SOL)..."
+                            autocomplete="off">
                     </div>
-                    <div class="chips-row" id="risk-portfolio-chips" style="background:var(--bg-input); padding:8px; border-radius:8px; border:1px solid var(--border); min-height:45px">
+                    <div class="chips-row" id="risk-portfolio-chips"
+                        style="background:var(--bg-input); padding:8px; border-radius:8px; border:1px solid var(--border); min-height:45px">
                         <span class="chips-empty">Henüz cüzdana coin eklenmedi.</span>
                     </div>
-                    
-                    <div style="background:var(--bg-card); border-radius:8px; padding:16px; margin-top:16px; border-left:4px solid var(--border-light)" id="risk-result-box">
+
+                    <div style="background:var(--bg-card); border-radius:8px; padding:16px; margin-top:16px; border-left:4px solid var(--border-light)"
+                        id="risk-result-box">
                         <h4 style="font-size:0.85rem; margin-bottom:8px; color:var(--text-2)">AI Analiz Sonucu</h4>
-                        <p style="font-size:0.75rem; color:var(--text-3)" id="risk-result-desc">Analiz için en az 2 coin ekleyin.</p>
+                        <p style="font-size:0.75rem; color:var(--text-3)" id="risk-result-desc">Analiz için en az 2 coin
+                            ekleyin.</p>
                     </div>
                 </div>
-                
-                <button class="swap-modal-close" data-close="modal-risk" style="width:100%; margin-top:20px;">Kapat</button>
+
+                <button class="swap-modal-close" data-close="modal-risk"
+                    style="width:100%; margin-top:20px;">Kapat</button>
             </div>
         </div>
 
         <!-- Yönlendirme: Premium Ödeme Modalı (MOCK) -->
         <div id="modal-premium" class="swap-modal hidden">
             <div class="swap-modal-content" style="max-width:400px; width:100%; text-align:center;">
-                <div style="width:64px; height:64px; background:linear-gradient(135deg, var(--accent), #FF9800); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+                <div
+                    style="width:64px; height:64px; background:linear-gradient(135deg, var(--accent), #FF9800); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
                     <span style="font-size:1.8rem; color:#181A20">💎</span>
                 </div>
                 <h3 class="swap-modal-title" style="font-size:1.3rem; margin-bottom:8px">Premium'a Geçin</h3>
-                <p class="swap-desc" style="margin-bottom:20px;">Aylık <b>$29.99</b> ile platformun tüm profesyonel yeteneklerinin kilidini bugün açın.</p>
-                
-                <ul style="text-align:left; font-size:0.85rem; color:var(--text-2); margin-bottom:24px; padding-left:20px; line-height:1.7;">
+                <p class="swap-desc" style="margin-bottom:20px;">Aylık <b>$29.99</b> ile platformun tüm profesyonel
+                    yeteneklerinin kilidini bugün açın.</p>
+
+                <ul
+                    style="text-align:left; font-size:0.85rem; color:var(--text-2); margin-bottom:24px; padding-left:20px; line-height:1.7;">
                     <li>🤖 <b>Zaman Makinesi (Backtest):</b> AI sinyallerinin tarihsel kazanım oranlarını görün.</li>
-                    <li>🔔 <b>Canlı Alarm:</b> Fiyat uyumsuzluğu yakalandığında sesten ve lobi bildiriminden faydalanın.</li>
+                    <li>🔔 <b>Canlı Alarm:</b> Fiyat uyumsuzluğu yakalandığında sesten ve lobi bildiriminden faydalanın.
+                    </li>
                     <li>⚡ <b>Hacim Şoku:</b> Matrix üzerinde para giriş çıkışlarını glow efektiyle takip edin.</li>
                     <li>🛡️ <b>Cüzdan Risk Testi:</b> İflas riskini hesaplayın, Hedge önerisi alın.</li>
                     <li>🌐 <b>Küresel Piyasalar:</b> DXY, S&P 500 ve XAU verisi ile büyük resmi görün.</li>
-                    <li>📈 <b>Overlay Grafik:</b> Matris hücresine tıklayıp iki coinin normalize fiyat hareketini karşılaştırın.</li>
+                    <li>📈 <b>Overlay Grafik:</b> Matris hücresine tıklayıp iki coinin normalize fiyat hareketini
+                        karşılaştırın.</li>
                     <li>📊 <b>Z-Score Anomali:</b> İstatistiksel arbitraj fırsatlarını otomatik algılayın.</li>
                     <li>📥 <b>PDF Rapor:</b> Kurumsal düzeyde günlük PDF raporu tek tıkla indirin.</li>
                 </ul>
-                
-                <button class="btn-primary" id="btn-mock-pay" style="width:100%; padding:14px; font-size:1rem; margin-bottom:12px; background:#635BFF; color:white; box-shadow:0 4px 14px rgba(99, 91, 255, 0.3)">💳 Stripe ile Güvenli Öde</button>
+
+                <button class="btn-primary" id="btn-mock-pay"
+                    style="width:100%; padding:14px; font-size:1rem; margin-bottom:12px; background:#635BFF; color:white; box-shadow:0 4px 14px rgba(99, 91, 255, 0.3)">💳
+                    Stripe ile Güvenli Öde</button>
                 <button class="btn-ghost" data-close="modal-premium" style="width:100%">Şimdilik İptal</button>
             </div>
         </div>
@@ -395,39 +503,52 @@
         <!-- ═══ Canlı Alarmlar (Watchlist & Notifications) Modalı ═══ -->
         <div id="modal-alarm" class="swap-modal hidden">
             <div class="swap-modal-content" style="max-width:540px; width:100%; position:relative; overflow:hidden;">
-                <h3 class="swap-modal-title" style="margin-bottom:4px; text-align:left; display:flex; align-items:center; gap:8px; color:var(--accent)">
+                <h3 class="swap-modal-title"
+                    style="margin-bottom:4px; text-align:left; display:flex; align-items:center; gap:8px; color:var(--accent)">
                     🔔 Canlı Radar ve Alarm Sistemi <span class="premium-badge">PRO</span>
                 </h3>
-                <p class="swap-desc" style="margin-bottom:16px; text-align:left;">Sürekli ekrana bakmanıza gerek yok. Stratejinizi girin, hedef gerçekleştiğinde arka planda sesli ve görsel bildirim alın.</p>
-                
-                <div class="premium-blur-overlay" id="alarm-lock-overlay" style="border-radius:12px; z-index:10; background:rgba(11, 14, 17, 0.85)">
+                <p class="swap-desc" style="margin-bottom:16px; text-align:left;">Sürekli ekrana bakmanıza gerek yok.
+                    Stratejinizi girin, hedef gerçekleştiğinde arka planda sesli ve görsel bildirim alın.</p>
+
+                <div class="premium-blur-overlay" id="alarm-lock-overlay"
+                    style="border-radius:12px; z-index:10; background:rgba(11, 14, 17, 0.85)">
                     <span class="lock-icon" style="font-size:2rem; margin-bottom:10px; display:block">🔒</span>
-                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Alarmlar Kilitli</h4>
-                    <p style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">Uyurken bile fırsatları yakalamak için HFT Push Alarmlarını açın.</p>
-                    <button class="btn-primary" data-open="modal-premium" style="font-size:0.8rem; padding:8px 20px">Hemen Kilidi Aç</button>
+                    <h4 style="margin-bottom:8px; font-family:var(--font-display); font-size:1.1rem">Alarmlar Kilitli
+                    </h4>
+                    <p
+                        style="font-size:0.8rem; color:var(--text-3); margin-bottom:16px; text-align:center; max-width:280px">
+                        Uyurken bile fırsatları yakalamak için HFT Push Alarmlarını açın.</p>
+                    <button class="btn-primary" data-open="modal-premium"
+                        style="font-size:0.8rem; padding:8px 20px">Hemen Kilidi Aç</button>
                 </div>
 
                 <div class="blur-content" id="alarm-panel-content">
                     <!-- Alarm Kurma Formu -->
                     <div class="alarm-config-row" style="display:flex; gap:8px; margin-bottom:12px;">
-                        <select id="alarm-pair-select" style="flex:1.3; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; font-family:var(--font); font-size:0.82rem">
+                        <select id="alarm-pair-select"
+                            style="flex:1.3; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; font-family:var(--font); font-size:0.82rem">
                             <option value="">Çift Seçin...</option>
                         </select>
-                        <select id="alarm-condition-select" style="flex:1.2; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; font-family:var(--font); font-size:0.82rem">
-                            <option value="lt">Altına düşerse (<)</option>
+                        <select id="alarm-condition-select"
+                            style="flex:1.2; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; font-family:var(--font); font-size:0.82rem">
+                            <option value="lt">Altına düşerse (<)< /option>
                             <option value="gt">Üstüne çıkarsa (>)</option>
                         </select>
-                        <input type="number" id="alarm-threshold-input" value="0.50" step="0.05" min="-1" max="1" style="width:70px; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; text-align:center; font-family:var(--font); font-size:0.82rem">
+                        <input type="number" id="alarm-threshold-input" value="0.50" step="0.05" min="-1" max="1"
+                            style="width:70px; background:var(--bg-input); border:1px solid var(--border); color:var(--text-1); border-radius:8px; padding:10px; text-align:center; font-family:var(--font); font-size:0.82rem">
                     </div>
-                    <button class="btn-primary" id="btn-add-alarm" style="width:100%; font-size:0.82rem; padding:10px; background:var(--accent-hover); color:#000; margin-bottom:16px">
+                    <button class="btn-primary" id="btn-add-alarm"
+                        style="width:100%; font-size:0.82rem; padding:10px; background:var(--accent-hover); color:#000; margin-bottom:16px">
                         🔔 Alarm Kur ve Arka Planda İzle
                     </button>
-                    
+
                     <!-- Aktif Alarmlar -->
                     <div style="margin-top:4px">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+                        <div
+                            style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
                             <h4 style="font-size:0.8rem; color:var(--text-4)">Aktif İzleme Listesi (Watchlist)</h4>
-                            <span class="live-indicator" id="alarm-live-indicator" style="display:none"><span class="live-dot"></span>Taranıyor</span>
+                            <span class="live-indicator" id="alarm-live-indicator" style="display:none"><span
+                                    class="live-dot"></span>Taranıyor</span>
                         </div>
                         <div id="alarm-watchlist" style="max-height:200px; overflow-y:auto;">
                             <div style="padding:16px; text-align:center; color:var(--text-4); font-size:0.78rem;">
@@ -436,8 +557,9 @@
                         </div>
                     </div>
                 </div>
-                
-                <button class="swap-modal-close" data-close="modal-alarm" style="width:100%; margin-top:20px;">Kapat</button>
+
+                <button class="swap-modal-close" data-close="modal-alarm"
+                    style="width:100%; margin-top:20px;">Kapat</button>
             </div>
         </div>
 
@@ -445,18 +567,22 @@
         <div id="modal-chart-overlay" class="swap-modal hidden">
             <div class="swap-modal-content chart-overlay-modal">
                 <div class="chart-overlay-header">
-                    <h3 class="swap-modal-title" id="chart-overlay-title" style="margin-bottom:0; text-align:left; display:flex; align-items:center; gap:8px; flex:1">
+                    <h3 class="swap-modal-title" id="chart-overlay-title"
+                        style="margin-bottom:0; text-align:left; display:flex; align-items:center; gap:8px; flex:1">
                         📈 Fiyat Kıyaslama
                     </h3>
                     <button class="chart-overlay-close-btn" data-close="modal-chart-overlay">✕</button>
                 </div>
-                <p class="swap-desc" id="chart-overlay-desc" style="margin-bottom:12px; text-align:left;">Son 30 günlük normalize fiyat hareketi (Baz: 100)</p>
-                <div id="chart-overlay-container" style="position:relative; width:100%; height:350px; border-radius:10px; overflow:hidden; background:var(--bg-elevated); border:1px solid var(--border)">
+                <p class="swap-desc" id="chart-overlay-desc" style="margin-bottom:12px; text-align:left;">Son 30 günlük
+                    normalize fiyat hareketi (Baz: 100)</p>
+                <div id="chart-overlay-container"
+                    style="position:relative; width:100%; height:350px; border-radius:10px; overflow:hidden; background:var(--bg-elevated); border:1px solid var(--border)">
                     <canvas id="chartjs-canvas"></canvas>
                 </div>
                 <div class="chart-overlay-legend" id="chart-overlay-legend"></div>
                 <div class="chart-overlay-corr" id="chart-overlay-corr"></div>
-                <button class="swap-modal-close" data-close="modal-chart-overlay" style="width:100%; margin-top:16px;">Kapat</button>
+                <button class="swap-modal-close" data-close="modal-chart-overlay"
+                    style="width:100%; margin-top:16px;">Kapat</button>
             </div>
         </div>
 
@@ -470,9 +596,11 @@
         </div>
         <div class="footer-contact">
             Şirketinize Özel VIP Dashboard veya Kaynak Kodu İçin Ulaşın:
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=togmusmuhammed@gmail.com" target="_blank" rel="noopener noreferrer" class="footer-link" title="Gmail üzerinden ulaşın">✉️ Mail</a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=togmusmuhammed@gmail.com" target="_blank"
+                rel="noopener noreferrer" class="footer-link" title="Gmail üzerinden ulaşın">✉️ Mail</a>
             <span class="footer-separator">|</span>
-            <a href="https://t.me/TGMS07" target="_blank" rel="noopener noreferrer" class="footer-link" title="Telegram üzerinden ulaşın">✈️ Telegram</a>
+            <a href="https://t.me/TGMS07" target="_blank" rel="noopener noreferrer" class="footer-link"
+                title="Telegram üzerinden ulaşın">✈️ Telegram</a>
         </div>
     </footer>
 
@@ -480,32 +608,33 @@
 
     <!-- ═══ PWA Service Worker Kaydı ═══ -->
     <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((registration) => {
-            console.log('✅ [PWA] Service Worker başarıyla kaydedildi. Scope:', registration.scope);
-            
-            // Yeni versiyon kontrolü
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              console.log('🔄 [PWA] Yeni Service Worker bulundu, güncelleniyor...');
-              
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'activated') {
-                  // Kullanıcıya güncelleme bildirimi (opsiyonel toast)
-                  if (typeof showToast === 'function') {
-                    showToast('🔄 Uygulama güncellendi! Yeni özellikler yüklendi.', 'success');
-                  }
-                }
-              });
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('✅ [PWA] Service Worker başarıyla kaydedildi. Scope:', registration.scope);
+
+                        // Yeni versiyon kontrolü
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            console.log('🔄 [PWA] Yeni Service Worker bulundu, güncelleniyor...');
+
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'activated') {
+                                    // Kullanıcıya güncelleme bildirimi (opsiyonel toast)
+                                    if (typeof showToast === 'function') {
+                                        showToast('🔄 Uygulama güncellendi! Yeni özellikler yüklendi.', 'success');
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('❌ [PWA] Service Worker kaydı başarısız:', error);
+                    });
             });
-          })
-          .catch((error) => {
-            console.error('❌ [PWA] Service Worker kaydı başarısız:', error);
-          });
-      });
-    }
+        }
     </script>
 </body>
+
 </html>

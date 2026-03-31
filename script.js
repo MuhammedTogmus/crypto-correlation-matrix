@@ -705,11 +705,14 @@ async function fetchTop200() {
         .slice(0, CONFIG.topCoinLimit);
     coins.forEach((c,i) => c.rank = i+1);
     
-    // Premium Varlık Enjeksiyonu
+    // Premium Geleneksel Makro Varlık Enjeksiyonu
     const premiumAssets = [
         { symbol: 'SPX', quoteVolume: 99999999999, isPremium: true, rank: 'PRO', name: 'S&P 500' },
-        { symbol: 'DXY', quoteVolume: 99999999998, isPremium: true, rank: 'PRO', name: 'Dolar Endeksi' },
-        { symbol: 'GOLD', quoteVolume: 99999999997, isPremium: true, rank: 'PRO', name: 'Ons Altın' }
+        { symbol: 'NDX', quoteVolume: 99999999998, isPremium: true, rank: 'PRO', name: 'NASDAQ 100' },
+        { symbol: 'DXY', quoteVolume: 99999999997, isPremium: true, rank: 'PRO', name: 'US Dollar Index' },
+        { symbol: 'GOLD', quoteVolume: 99999999996, isPremium: true, rank: 'PRO', name: 'Altın (Ounce)' },
+        { symbol: 'OIL', quoteVolume: 99999999995, isPremium: true, rank: 'PRO', name: 'Ham Petrol (WTI)' },
+        { symbol: 'US10Y', quoteVolume: 99999999994, isPremium: true, rank: 'PRO', name: 'ABD 10 Yıllık Tahvil' }
     ];
     coins.unshift(...premiumAssets); // En üste ekle
     
@@ -825,24 +828,80 @@ function setMatrixSize(size) {
     updateSelectionUI();
 }
 
+// ═══ Makro Veri Motoru (Yahoo Finance Proxy) ═══
+// Yahoo Finance Ticker Haritası
+const YF_MAP = {
+    'SPX': '^GSPC',
+    'NDX': '^NDX',
+    'DXY': 'DX-Y.NYB',
+    'GOLD': 'GC=F',
+    'OIL': 'CL=F',
+    'US10Y': '^TNX'
+};
+
+async function fetchYahooFinanceProxy(symbol, limit, formatAsKlines = false) {
+    const ticker = YF_MAP[symbol];
+    if(!ticker) throw new Error("Unknown Macro Asset");
+    
+    // YF'den daha fazla veri çekip son 'limit' günü dolduracağız (haftasonu boşlukları için margin)
+    const marginLimit = limit + 15; 
+    
+    // Bedava bir CORS Proxy kullanarak Yahoo Finance api'sini devirmek
+    const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=3mo`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+    
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error(`YF Proxy HTTP ${res.status}`);
+    const data = await res.json();
+    
+    const result = data.chart.result[0];
+    const timestamps = result.timestamp; // array of unix timestamps in seconds
+    const closes = result.indicators.quote[0].close; // array of prices
+    
+    // Mapping: YYYY-MM-DD -> price
+    const priceMap = {};
+    for (let i = 0; i < timestamps.length; i++) {
+        if (closes[i] !== null) {
+            const dateStr = new Date(timestamps[i] * 1000).toISOString().split('T')[0];
+            priceMap[dateStr] = closes[i];
+        }
+    }
+    
+    // Forward-Fill: Kripto 7/24 çalışır, Makro eksik gününe 'önceki kapanışı' yazarız
+    const finalData = [];
+    let lastKnownPrice = null;
+    
+    // Bugünden geriye 'limit' kadar gün
+    for (let i = limit - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        
+        if (priceMap[dateStr]) {
+            lastKnownPrice = priceMap[dateStr];
+        }
+        
+        // Eğer hiçbir geçmiş veri yoksa dummy, varsa lastKnownPrice
+        const val = lastKnownPrice || 100;
+
+        if (formatAsKlines) {
+            finalData.push({ time: Math.floor(d.getTime()/1000), value: val });
+        } else {
+            finalData.push(val);
+        }
+    }
+    
+    return finalData;
+}
+
 // ═══ Fiyat Verisi ═══
 async function fetchCoinPrices(symbol) {
     const p = CONFIG.periodMap[STATE.period];
     
-    // ═══ Makro Veri Proxy & Mock ═══ 
-    if (symbol === 'GOLD') symbol = 'PAXG';
-    if (symbol === 'SPX' || symbol === 'DXY') {
-        // Binance'de hisse endeksi yok, inandırıcı mock data üretelim (SaaS hissiyatı için)
-        // Eğer SPX ise yukarı yönlü, DXY ise rastgele volatiliteli bir seri oluştur
-        let base = symbol === 'SPX' ? 5100 : 104;
-        const trend = symbol === 'SPX' ? 1.0005 : 1.0;
-        const mock = [];
-        for (let i = 0; i < p.limit; i++) {
-            base = base * trend + (Math.random() - 0.5) * (symbol === 'SPX' ? 20 : 0.5);
-            mock.push(base);
-        }
-        await sleep(50); // API delay simulasyonu
-        return mock;
+    // ═══ Makro Varlık İsteği Yakalayıcı ═══ 
+    if (YF_MAP[symbol]) {
+        // YF verisi limit=limit ile çekilir
+        return await fetchYahooFinanceProxy(symbol, p.limit, false);
     }
 
     const params = new URLSearchParams({ symbol: `${symbol}USDT`, interval: p.interval, limit: p.limit });
@@ -2396,19 +2455,9 @@ async function openChartOverlay(coinA, coinB) {
 }
 
 async function fetchKlinesForChart(symbol) {
-    // ═══ Makro Veri Proxy & Mock ═══ 
-    if (symbol === 'GOLD') symbol = 'PAXG';
-    if (symbol === 'SPX' || symbol === 'DXY') {
-        let base = symbol === 'SPX' ? 5100 : 104;
-        const trend = symbol === 'SPX' ? 1.0005 : 1.0;
-        const mock = [];
-        const now = Math.floor(Date.now() / 1000);
-        for (let i = 29; i >= 0; i--) {
-            base = base * trend + (Math.random() - 0.5) * (symbol === 'SPX' ? 20 : 0.5);
-            mock.push({ time: now - (i * 86400), value: base });
-        }
-        await sleep(50);
-        return mock;
+    // ═══ Makro Grafik Verisi Yakalayıcı ═══ 
+    if (YF_MAP[symbol]) {
+        return await fetchYahooFinanceProxy(symbol, 30, true);
     }
 
     const params = new URLSearchParams({ symbol: `${symbol}USDT`, interval: '1d', limit: 30 });
