@@ -2514,15 +2514,21 @@ if(domBtnExportPDF) {
 async function generatePDFReport() {
     if(!STATE.lastPriceData || !STATE.selectedCoins.length) return;
 
+    if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+        if(typeof appendToast === 'function') {
+            appendToast('⏳ Bekleniyor...', 'Lütfen 2 saniye bekleyip tekrar tıklayın, PDF motoru yükleniyor.', false);
+        } else {
+            alert('Lütfen 2 saniye bekleyip tekrar tıklayın, PDF motoru yükleniyor.');
+        }
+        return;
+    }
+
     const btn = domBtnExportPDF;
     const origHTML = btn.innerHTML;
     btn.innerHTML = `<span class="spinner" style="width:12px;height:12px;display:inline-block;vertical-align:middle;border-width:2px;border-top-color:#E040FB;margin-right:6px"></span> ${t('pdf_generating')}`;
     btn.disabled = true;
 
     try {
-        if(typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
-            throw new Error("jsPDF kütüphanesi yüklenemedi. Lütfen sayfayı yenilediğinizden emin olun.");
-        }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const pageW = doc.internal.pageSize.getWidth();
