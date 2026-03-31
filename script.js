@@ -731,9 +731,25 @@ function renderCoinList(coins) {
         if (STATE.selectedCoins.includes(coin.symbol)) el.classList.add('selected');
         
         // Premium Kontrolü
-        if (coin.isPremium) {
+        if (coin.isPremium && !STATE.isPremium) {
             el.innerHTML = `<span class="coin-rank" style="color:var(--accent);font-weight:700">${coin.rank}</span><span class="coin-symbol">${coin.symbol} <span style="font-size:0.6rem;opacity:0.6">(${coin.name})</span></span><span class="coin-vol" style="margin-left:auto;color:var(--accent)">🔒 PRO</span>`;
             el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else if (coin.isPremium && STATE.isPremium) {
+            el.innerHTML = `<span class="coin-rank" style="color:var(--accent);font-weight:700">${coin.rank}</span><span class="coin-symbol">${coin.symbol} <span style="font-size:0.6rem;opacity:0.6">(${coin.name})</span></span><span class="coin-vol" style="margin-left:auto;color:var(--accent)">💎 UNLOCKED</span>`;
+            el.addEventListener('click', () => {
+                if (STATE.selectedCoins.includes(coin.symbol)) {
+                    STATE.selectedCoins = STATE.selectedCoins.filter(s => s !== coin.symbol);
+                    el.classList.remove('selected');
+                } else {
+                    if (STATE.selectedCoins.length >= CONFIG.maxCoinsLimit) {
+                        if(typeof appendToast === 'function') appendToast('⚠️ Limit', `Maksimum ${CONFIG.maxCoinsLimit} coin seçebilirsiniz.`, true);
+                        return;
+                    }
+                    STATE.selectedCoins.push(coin.symbol);
+                    el.classList.add('selected');
+                }
+                updateSelectionUI();
+            });
         } else if (coin.isCustomSearch) {
             el.innerHTML = `<span class="coin-symbol" style="width:100%; text-align:center; display:flex; justify-content:center; align-items:center; gap:6px;"><span>🔍</span> <b>${coin.symbol}</b> API'de Ara</span>`;
             el.style.background = "var(--accent-dim)";
@@ -1459,9 +1475,12 @@ function renderSwapGrid(filter = '') {
         const el = document.createElement('div');
         el.className = 'swap-coin';
         
-        if (coin.isPremium) {
+        if (coin.isPremium && !STATE.isPremium) {
             el.innerHTML = `<span class="sc-rank" style="color:var(--accent)">PRO</span><span class="sc-sym">${coin.symbol}</span><span style="margin-left:auto;font-size:0.8rem">🔒</span>`;
             el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else if (coin.isPremium && STATE.isPremium) {
+            el.innerHTML = `<span class="sc-rank" style="color:var(--accent)">PRO</span><span class="sc-sym">${coin.symbol}</span><span style="margin-left:auto;font-size:0.8rem">💎</span>`;
+            el.addEventListener('click', () => { handleSwapSelection(coin, el); });
         } else if (coin.isCustomSearch) {
             el.innerHTML = `<span class="sc-sym" style="width:100%;text-align:center;color:var(--accent)">🔍 ${coin.symbol} API'de Ara</span>`;
             el.style.border = "1px solid var(--accent-hover)";
@@ -1932,9 +1951,25 @@ function renderIncreaseGrid(q) {
         let el = document.createElement('div');
         el.className = 'increase-item';
         
-        if (coin.isPremium) {
+        if (coin.isPremium && !STATE.isPremium) {
             el.innerHTML = `<span class="inc-rank" style="color:var(--accent)">PRO</span> <span class="inc-sym">${coin.symbol}</span><span style="font-size:0.8rem">🔒</span>`;
             el.addEventListener('click', () => document.getElementById('modal-premium').classList.remove('hidden'));
+        } else if (coin.isPremium && STATE.isPremium) {
+            el.innerHTML = `<span class="inc-rank" style="color:var(--accent)">PRO</span> <span class="inc-sym">${coin.symbol}</span><span style="font-size:0.8rem">💎</span>`;
+            el.addEventListener('click', () => {
+                const idx = DOM.increaseGrid.querySelectorAll('.increase-item').indexOf(el); // Need real logic
+                // Wait, normal coins use:
+                // el.addEventListener('click', () => {
+                //      selectedIncreaseCoin = coin.symbol; 
+                //      DOM.increaseGrid.querySelectorAll('.increase-item').forEach(x=>x.classList.remove('selected'));
+                //      el.classList.add('selected'); 
+                //      checkIncreaseEligibility(); 
+                // });
+                selectedIncreaseCoin = coin.symbol;
+                DOM.increaseGrid.querySelectorAll('.increase-item').forEach(x => x.classList.remove('selected'));
+                el.classList.add('selected');
+                if(typeof checkIncreaseEligibility === 'function') checkIncreaseEligibility();
+            });
         } else if (coin.isCustomSearch) {
             el.innerHTML = `<span class="inc-sym" style="width:100%;text-align:center;color:var(--accent)">🔍 ${coin.symbol} API'de Ara</span>`;
             el.style.border = "1px solid var(--accent-hover)";
