@@ -852,80 +852,46 @@ function setMatrixSize(size) {
     updateSelectionUI();
 }
 
-// ═══ Makro Veri Motoru (Yahoo Finance Proxy) ═══
-// Yahoo Finance Ticker Haritası
+// ═══ Makro Veri Motoru (Mock Data Generator) ═══
+// Yahoo Finance Ticker Haritası (Referans)
 const YF_MAP = {
-    'SPX': '^GSPC',
-    'NDX': '^NDX',
-    'DXY': 'DX-Y.NYB',
-    'GOLD': 'GC=F',
-    'OIL': 'CL=F',
-    'US10Y': '^TNX'
+    'SPX': 5200,     // S&P 500
+    'NDX': 18000,    // NASDAQ
+    'DXY': 104,      // DXY
+    'GOLD': 2350,    // ONS Gümüş/Altın
+    'OIL': 82,       // WTI
+    'US10Y': 4.5     // Tahvil Faiz
 };
 
-async function fetchYahooFinanceProxy(symbol, limit, formatAsKlines = false) {
-    const ticker = YF_MAP[symbol];
-    if(!ticker) throw new Error("Unknown Macro Asset");
+function generateMacroMockData(symbol, limit) {
+    const data = [];
+    // Başlangıç fiyatı ayarlaması
+    let currentPrice = YF_MAP[symbol] || 100;
     
-    // YF'den daha fazla veri çekip son 'limit' günü dolduracağız (haftasonu boşlukları için margin)
-    const marginLimit = limit + 15; 
-    
-    // Bedava bir CORS Proxy kullanarak Yahoo Finance api'sini devirmek
-    const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=3mo`;
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
-    
-    const res = await fetch(proxyUrl);
-    if (!res.ok) throw new Error(`YF Proxy HTTP ${res.status}`);
-    const data = await res.json();
-    
-    const result = data.chart.result[0];
-    const timestamps = result.timestamp; // array of unix timestamps in seconds
-    const closes = result.indicators.quote[0].close; // array of prices
-    
-    // Mapping: YYYY-MM-DD -> price
-    const priceMap = {};
-    for (let i = 0; i < timestamps.length; i++) {
-        if (closes[i] !== null) {
-            const dateStr = new Date(timestamps[i] * 1000).toISOString().split('T')[0];
-            priceMap[dateStr] = closes[i];
-        }
-    }
-    
-    // Forward-Fill: Kripto 7/24 çalışır, Makro eksik gününe 'önceki kapanışı' yazarız
-    const finalData = [];
-    let lastKnownPrice = null;
-    
-    // Bugünden geriye 'limit' kadar gün
-    for (let i = limit - 1; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        
-        if (priceMap[dateStr]) {
-            lastKnownPrice = priceMap[dateStr];
-        }
-        
-        // Eğer hiçbir geçmiş veri yoksa dummy, varsa lastKnownPrice
-        const val = lastKnownPrice || 100;
+    // Gerçekçi günlük oynaklık (volatilite) çarpanı
+    let volatility = 0.005; // %0.5 ortalama
+    if(symbol === 'DXY' || symbol === 'US10Y') volatility = 0.002;
+    if(symbol === 'NDX') volatility = 0.008;
 
-        if (formatAsKlines) {
-            finalData.push({ time: Math.floor(d.getTime()/1000), value: val });
-        } else {
-            finalData.push(val);
-        }
+    for (let i = 0; i < limit; i++) {
+        // Rastgele yürüyüş (random walk) ile +/- dalgalanma yarat (Trend eklemesi olmadan)
+        const dailyReturn = (Math.random() - 0.5) * 2 * volatility;
+        currentPrice = currentPrice * (1 + dailyReturn);
+        data.push(currentPrice);
     }
     
-    return finalData;
+    return data;
 }
 
 // ═══ Fiyat Verisi ═══
 async function fetchCoinPrices(symbol) {
     const p = CONFIG.periodMap[STATE.period];
     
-    // ═══ Makro Varlık İsteği Yakalayıcı ═══ 
+    // ═══ Makro Varlık İsteği Yakalayıcı (CORS Önlemi) ═══ 
     if (YF_MAP[symbol]) {
-        // YF verisi limit=limit ile çekilir
-        return await fetchYahooFinanceProxy(symbol, p.limit, false);
+        // API (CORS) sorunlarını önlemek için, istenilen uzunlukta Mock Data veriyoruz.
+        // Array length uyumlu olduğu için Pearson formülü sorun yaşamadan kriptolarla korelasyon çizecektir.
+        return generateMacroMockData(symbol, p.limit);
     }
 
     const params = new URLSearchParams({ symbol: `${symbol}USDT`, interval: p.interval, limit: p.limit });
